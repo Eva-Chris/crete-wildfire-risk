@@ -16,7 +16,7 @@ It also shows today's Fire Weather Index (FWI) at eight weather stations.
  DEM, CORINE, EFFIS ──┴─► backend/build_static_risk.py ─► forests_with_risk_score_v2.geojson ─┐
                                                           + model.json                        │
                                                                                               │
- OSM Greece extract ──────► backend/build_road_network.py ─► data/road_graph.npz ────────────┤
+ OSM Greece extract ──────► backend/build_road_network.py ─► data/road_graph.npz ─────────────┤
  (Geofabrik)                                                                                  │
                                                                                               ▼
  Open-Meteo ─► backend/fwi.py ───────────────────────────► backend/main.py (FastAPI)
@@ -67,8 +67,7 @@ ng serve                             # http://localhost:4200
 ```
 
 The API address is set in `src/environments/`. `environment.development.ts` (used by `ng serve`) points
-to `http://127.0.0.1:8000/api`. For a deployment, serve the API under the same origin or edit
-`environment.ts`, and set `CORS_ORIGINS` on the API to the site's address.
+to `http://127.0.0.1:8000/api`.
 
 Leaflet's CSS must be loaded, for example in `angular.json` under `styles`:
 `"node_modules/leaflet/dist/leaflet.css"`.
@@ -99,52 +98,6 @@ Zone and settlement results are arrays in the same order as the `/api/risk-zones
 | `GET /api/fwi?refresh=false`     | Fire Weather Index per station (cached 3 hours).                                                                                                    |
 | `GET /api/{layer}`               | Map layers: `power-lines`, `power-nodes`, `power-stations`, `settlements`, `rivers`, `lakes`, `roads`, `fire-stations`, `water-points`, `helipads`. |
 
-## Deployment
-
-The frontend is a static Angular build. The backend needs a real server.
-
-**Frontend.** `ng build` writes static files to `dist/`. Any static host works (Cloudflare Pages,
-Netlify, Vercel, GitHub Pages, or your own web server). Configure it to serve `index.html` for unknown
-paths, because the app uses client-side routes such as `/docs`. Set the production API address in
-`src/environments/environment.ts` before building.
-
-**Backend.** Run FastAPI with uvicorn behind a reverse proxy (nginx, Caddy) or on a platform such as
-Render, Fly.io or Railway.
-
-- **Memory:** plan for roughly **1 to 2 GB of RAM**. geopandas, the zone geometries and the road graph are
-  all held in memory. A 512 MB free tier will probably not be enough. Measure on your host.
-- **Files:** upload the `data/` folder, including `road_graph.npz`. Build the graph on your own machine,
-  because reading the Greece extract takes several minutes and temporary disk space. Don't build it on the
-  server.
-- **CORS:** set `CORS_ORIGINS` to the address of the frontend, comma-separated if there are several:
-
-```bash
-  CORS_ORIGINS=https://wildfire.example.org uvicorn main:app --host 0.0.0.0 --port 8000
-```
-
-- **Start-up:** the API loads the road graph and zone data when it starts, so the first start takes a
-  little while. Use a health check on `/`.
-- **Workers:** the caches live in each process's memory. One worker is simplest. With several workers,
-  each keeps its own copy of the data and its own cache.
-
-**Rate limiting.** `/api/access/proposed` and `/api/access/roads` run a graph search for every request, and
-anyone can send up to 10 points repeatedly. Before making the API public, limit these routes, either at
-the proxy or in the app (for example with [`slowapi`](https://github.com/laurentS/slowapi)). The weather and
-FWI endpoints already limit forced refreshes (`?refresh=true`) to protect the upstream API.
-
-**Third-party services and their limits**
-
-| Service                               | Used for                          | Limit to check                                                                                                                                                |
-| :------------------------------------ | :-------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [Open-Meteo](https://open-meteo.com/) | Weather and FWI                   | The free API is for **non-commercial use** only. A commercial or high-traffic site needs a paid plan.                                                         |
-| OpenTopoMap tiles                     | Terrain basemap                   | Public tile servers are meant for light use, and heavy traffic can be blocked. Use a provider with a plan (for example MapTiler or Stadia) or your own tiles. |
-| Esri World Imagery                    | Satellite basemap                 | Has its own terms for production apps. Check them before launch.                                                                                              |
-| OpenStreetMap data                    | Road graph, stations, settlements | ODbL. Keep the attribution visible.                                                                                                                           |
-
-**Before going public:** keep the planning-aid disclaimer visible, check that the fire station data is
-complete (uncovered counts are only as good as the station list), and have someone from the fire service
-review the assumed speeds in `build_road_network.py`.
-
 ## Tests
 
 ```bash
@@ -168,8 +121,7 @@ The original QGIS project file used for data preparation and styling is availabl
 ## Data and attribution
 
 - Contains Copernicus Land Monitoring Service information, © European Union, EEA (CORINE Land Cover 2012).
-- Burnt areas: EFFIS. Weather: [Open-Meteo.com](https://open-meteo.com/) (CC BY 4.0; the free API is for
-  non-commercial use).
+- Burnt areas: EFFIS. Weather: [Open-Meteo.com](https://open-meteo.com/) (CC BY 4.0).
 - Base maps: © OpenTopoMap, OpenStreetMap contributors, SRTM; Esri World Imagery.
 - Road network: © OpenStreetMap contributors (ODbL), via Geofabrik.
 - Other layers: see [`backend/data/README.md`](backend/data/README.md).
