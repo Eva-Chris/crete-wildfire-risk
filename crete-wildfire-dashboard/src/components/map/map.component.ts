@@ -33,6 +33,7 @@ import {
   scoreOf,
 } from '../../lib/risk-model';
 import {
+  AccessResponse,
   Feat,
   FeatColl,
   FwiResponse,
@@ -82,6 +83,8 @@ interface ExposureRow {
   ha: number;
   stationKm: number;
   covered: boolean;
+  stationMin: number | null;
+  byRoad: boolean;
 }
 
 interface SettlementPoint {
@@ -378,6 +381,20 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private coverageLayer?: L.LayerGroup;
   stats = RISK_CLASSES.map((c) => ({ ...c, count: 0, pct: 0 }));
   totalZones = 0;
+  reachMode: 'road' | 'line' = 'line';
+  roadAvailable = false;
+  private coverageTimer?: ReturnType<typeof setTimeout>;
+  driveMin = 15;
+  roadWarn: string | null = null;
+  private roadBase: AccessResponse | null = null;
+  private roadHypo: AccessResponse | null = null;
+  private roadReq?: Subscription;
+
+  private reachLayer?: L.GeoJSON;
+  private reachRenderer?: L.Renderer;
+  private gapLayer?: L.LayerGroup;
+  private reachReq?: Subscription;
+  private reachTimer?: ReturnType<typeof setTimeout>;
 
   /** "Add proposed station" mode, and the stations placed so far (not saved anywhere). */
   placing = false;
@@ -395,6 +412,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     setTimeout(() => {
       this.outside(() => this.initMap());
       this.loadModel();
+      this.loadRoadBase();
       this.layers.filter((l) => l.visible).forEach((l) => this.activate(l.key));
       this.sub.add(
         timer(0, 10 * 60 * 1000).subscribe(() => this.loadWeather()),
@@ -407,7 +425,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.exposureRun++; // stop any exposure indexing still running
     this.sub.unsubscribe();
+    this.roadReq?.unsubscribe();
     this.map?.remove();
+    clearTimeout(this.reachTimer);
+    clearTimeout(this.coverageTimer);
+    this.reachReq?.unsubscribe();
   }
 
   /**
@@ -447,6 +469,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   /* ---------------- map setup ---------------- */
   private initMap(): void {
     this.map = L.map('map', {
+      preferCanvas: true,
       zoomControl: false,
       zoomSnap: 0.5,
       minZoom: 8,
@@ -467,6 +490,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       ['coveragePane', 415],
       ['hydroPane', 420],
       ['roadsPane', 430],
+      ['reachPane', 435],
       ['burnedPane', 445],
       ['powerPane', 450],
       ['settlePane', 470],
@@ -604,7 +628,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     for (const f of this.features) {
       const cls = classify(scoreOf(f.properties));
       counts[cls]++;
-      if (cls <= 1 && isNum(f.properties?.['dist_fire_m'])) {
+      const hasData = this.byRoad
+        ? isNum(f.properties?.['zid'])
+        : isNum(f.properties?.['dist_fire_m']);
+      if (cls <= 1 && hasData) {
         known = true;
         high++;
         if (this.isGap(f.properties)) gaps++;
@@ -673,14 +700,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     const gap = this.isGap(p);
     if (gap && cls <= 1) {
-      return {
-        ...base,
-        fillOpacity: Math.min(1, this.forestOpacity + 0.1),
-        color: '#111827',
-        weight: 1.8,
-        opacity: 1,
-        dashArray: '5 3',
-      };
+      return { ...base, fillOpacity: Math.min(1, this.forestOpacity + 0.1) };
     }
     return { ...base, fillOpacity: this.forestOpacity * (gap ? 0.55 : 0.3) };
   }
@@ -695,6 +715,12 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   /** A zone is a gap if it lies farther than the response radius from every station. */
   private isGap(p: Props | undefined, withHypo = true): boolean {
+    if (this.byRoad) {
+      const zid = p?.['zid'];
+      if (!isNum(zid)) return false;
+      const t = this.roadTime(zid, withHypo);
+      return t === null || t > this.driveMin;
+    }
     const base = p?.['dist_fire_m'];
     if (!isNum(base)) return false;
     const d = withHypo
@@ -717,8 +743,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   }
 
   onCoverageKm(ev: Event): void {
-    this.coverageKm = +(ev.target as HTMLInputElement).value;
-    this.applyCoverage();
+    this.coverageKm = +(ev.target as HTMLInputElement).value; // label updates instantly
+    clearTimeout(this.coverageTimer);
+    this.coverageTimer = setTimeout(() => this.applyCoverage(), 120);
   }
 
   private applyCoverage(): void {
@@ -726,7 +753,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       this.coverageLayer?.remove();
       this.coverageLayer = undefined;
 
-      if (this.coverageOn) {
+      if (this.coverageOn && !this.byRoad) {
         const circle = (ll: L.LatLng, proposed: boolean) =>
           L.circle(ll, {
             pane: 'coveragePane',
@@ -751,6 +778,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     });
 
     this.refreshRisk();
+    this.drawGapOutlines();
+    this.scheduleReachRoads();
     this.cdr.markForCheck();
   }
 
@@ -806,6 +835,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     }
     this.applyCoverage();
     this.cdr.markForCheck();
+    this.fetchRoadHypo();
   }
 
   /* ---------------- layers ---------------- */
@@ -889,7 +919,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
               const name = COLOR_OPTIONS.find(
                 (o) => o.id === this.colorBy,
               )!.label;
-              return `${esc(this.tr(name))}: <b>${isNum(v) ? v.toFixed(0) : '—'}</b>/100`;
+              return `${esc(this.tr(name))}: <b>${isNum(v) ? v.toFixed(0) : '-'}</b>/100`;
             }
             const s = scoreOf(f.properties);
             return `<b>${s.toFixed(1)}</b> ${this.tr(RISK_CLASSES[classify(s)].label).toLowerCase()}`;
@@ -986,7 +1016,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         this.settleRaw = asPoints(data).features.map((f) => {
           const [lng, lat] = (f.geometry as GeoJSON.Point).coordinates;
           return {
-            name: nameOf(f.properties, 'Settlement'),
+            name: nameOf(f.properties, ''),
             ll: L.latLng(lat, lng),
             props: f.properties ?? {},
           };
@@ -1206,10 +1236,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     <div class="fac">
       <div class="fac-top">
         <span>${esc(tr(r.factor.label))} <em>${Math.round(r.factor.weight * 100)}%</em></span>
-        <b>${r.pts === null ? '—' : '+' + r.pts.toFixed(1)}</b>
+        <b>${r.pts === null ? '-' : '+' + r.pts.toFixed(1)}</b>
       </div>
       <i><u style="width:${r.s ?? 0}%"></u></i>
-      <small>${esc(tr(r.factor.value(p)))} · ${tr('scored {s}/100', { s: r.s === null ? '—' : r.s.toFixed(0) })}${
+      <small>${esc(tr(r.factor.value(p)))} · ${tr('scored {s}/100', { s: r.s === null ? '-' : r.s.toFixed(0) })}${
         r.pts !== null && stat > 0
           ? ` · ${tr('{pct}% of score', { pct: ((r.pts / stat) * 100).toFixed(0) })}`
           : ''
@@ -1248,7 +1278,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       ${breakdownHtml}
       ${fwiHtml}
       <hr/>
-      <div class="row"><span>${tr('Zone')}</span><b>#${esc(p['gid'] ?? '—')}</b></div>
+      <div class="row"><span>${tr('Zone')}</span><b>#${esc(p['gid'] ?? '-')}</b></div>
       ${isNum(p['elev_m']) ? `<div class="row"><span>${tr('Mean elevation')}</span><b>${fmt(p['elev_m'], 0, ' m')}</b></div>` : ''}
     </div>`;
   }
@@ -1404,6 +1434,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     const limit = this.coverageKm * 1000;
     const circleHa = (Math.PI * EXPO_R * EXPO_R) / 10_000;
 
+    const roadOk =
+      this.byRoad &&
+      !!this.roadBase?.settlements &&
+      this.roadBase.n_settlements === this.settleIdx.length;
+
     this.exposure = this.settleIdx
       .map((s, id): ExposureRow => {
         let hit = 0;
@@ -1411,6 +1446,15 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         const share = hit / s.zones.length;
         let d = Infinity;
         for (const st of stations) d = Math.min(d, s.ll.distanceTo(st));
+        let covered = d <= limit;
+        let stationMin: number | null = null;
+        if (roadOk) {
+          let t = this.roadBase!.settlements![id] ?? null;
+          const h = this.roadHypo?.settlements?.[id] ?? null;
+          if (h !== null && (t === null || h < t)) t = h;
+          stationMin = t;
+          covered = t !== null && t <= this.driveMin;
+        }
         return {
           id,
           name: s.name,
@@ -1418,7 +1462,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
           share,
           ha: share * circleHa,
           stationKm: d / 1000,
-          covered: d <= limit,
+          stationMin,
+          byRoad: roadOk,
+          covered,
           props: s.props,
         };
       })
@@ -1466,8 +1512,13 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     <div class="pop">
       <h4>${esc(r.name)}</h4>
       <div class="row"><span>${tr('High-risk forest within 1 km')}</span><b>${r.ha.toFixed(0)} ha (${(r.share * 100).toFixed(0)}%)</b></div>
-      <div class="row"><span>${tr('Nearest fire station')}</span><b>${r.stationKm.toFixed(1)} km</b></div>
-      <div class="row"><span>${tr('Status at {km} km', { km: this.coverageKm })}</span><b style="color:${r.covered ? '#166534' : '#991b1b'}">${tr(r.covered ? 'covered' : 'uncovered')}</b></div>
+       ${
+         r.byRoad
+           ? `<div class="row"><span>${tr('Drive time to nearest station')}</span><b>${r.stationMin === null ? '> ' + this.roadMax + ' min' : r.stationMin.toFixed(0) + ' min'}</b></div>
+             <div class="row"><span>${tr('Status at {min} min', { min: this.driveMin })}</span><b style="color:${r.covered ? '#166534' : '#991b1b'}">${tr(r.covered ? 'covered' : 'uncovered')}</b></div>`
+           : `<div class="row"><span>${tr('Nearest fire station')}</span><b>${r.stationKm.toFixed(1)} km</b></div>
+             <div class="row"><span>${tr('Status at {km} km', { km: this.coverageKm })}</span><b style="color:${r.covered ? '#166534' : '#991b1b'}">${tr(r.covered ? 'covered' : 'uncovered')}</b></div>`
+       }
       ${attrs ? '<hr/>' + attrs : ''}
     </div>`;
   }
@@ -1482,6 +1533,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       [tr('High-risk forest within 1 km (ha)')]: Math.round(r.ha),
       [tr('Share of 1 km circle (%)')]: Math.round(r.share * 100),
       [tr('Nearest station (km)')]: +r.stationKm.toFixed(1),
+      ...(this.byRoad ? { [tr('Drive time (min)')]: r.stationMin ?? '' } : {}),
       [tr('Covered')]: tr(r.covered ? 'yes' : 'no'),
     }));
 
@@ -1502,13 +1554,21 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         tr('Scoring'),
         tr('Static susceptibility score (no weather adjustment)'),
       ],
-      [tr('Coverage radius (km)'), this.coverageKm],
+      [
+        this.byRoad
+          ? [tr('Drive time limit (min)'), this.driveMin]
+          : [tr('Coverage radius (km)'), this.coverageKm],
+      ],
       [tr('Proposed stations'), this.hypo.length],
       [
-        tr('Note'),
-        tr(
-          'Straight-line distances. High risk = top two percentile classes of the score.',
-        ),
+        [
+          tr('Note'),
+          tr(
+            this.byRoad
+              ? 'Drive times along OpenStreetMap roads at assumed fire-engine speeds. High risk = top two percentile classes of the score.'
+              : 'Straight-line distances. High risk = top two percentile classes of the score.',
+          ),
+        ],
       ],
     ]);
     info['!cols'] = [{ wch: 24 }, { wch: 80 }];
@@ -1544,5 +1604,173 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     a.download = 'settlement_exposure.csv';
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  get byRoad(): boolean {
+    return this.reachMode === 'road' && !!this.roadBase;
+  }
+  get roadMax(): number {
+    return this.roadBase?.max_min ?? 45;
+  }
+  get roadBuffer(): number {
+    return this.roadBase?.zone_buffer_m ?? 250;
+  }
+
+  /* ---------------- drive-time coverage ---------------- */
+  private loadRoadBase(): void {
+    this.api.getAccess().subscribe({
+      next: (r) => {
+        if (!r.available) return; // no road graph on the server: stay in straight-line mode
+        this.roadBase = r;
+        this.roadAvailable = true;
+        this.reachMode = 'road';
+        this.applyCoverage();
+      },
+      error: () => {}, // straight-line mode keeps working
+    });
+  }
+
+  setReachMode(m: 'road' | 'line'): void {
+    this.reachMode = m;
+    this.applyCoverage();
+  }
+
+  onDriveMin(ev: Event): void {
+    this.driveMin = +(ev.target as HTMLInputElement).value; // label updates instantly
+    clearTimeout(this.coverageTimer);
+    this.coverageTimer = setTimeout(() => this.applyCoverage(), 120);
+  }
+
+  /** Minutes from the nearest station (existing or proposed) to a zone. null = not reached. */
+  private roadTime(zid: number, withHypo: boolean): number | null {
+    let t = this.roadBase?.zones?.[zid] ?? null;
+    const h = withHypo ? (this.roadHypo?.zones?.[zid] ?? null) : null;
+    if (h !== null && (t === null || h < t)) t = h;
+    return t;
+  }
+
+  private fetchRoadHypo(): void {
+    this.roadReq?.unsubscribe(); // a newer placement makes the older answer irrelevant
+    if (!this.roadBase) return;
+    if (!this.hypo.length) {
+      this.roadHypo = null;
+      this.roadWarn = null;
+      this.applyCoverage();
+      return;
+    }
+    const pts = this.hypo.map((m): [number, number] => [
+      m.getLatLng().lat,
+      m.getLatLng().lng,
+    ]);
+    this.roadReq = this.api.getAccessProposed(pts).subscribe({
+      next: (r) => {
+        this.roadHypo = r;
+        this.roadWarn = (r.snap_m ?? []).some((d) => d > 500)
+          ? 'A proposed station is more than 500 m from the nearest road, so its drive times include a slow off-road leg.'
+          : null;
+        this.applyCoverage();
+      },
+      error: () => {
+        this.error = this.tr(
+          'Could not compute drive times for the proposed stations.',
+        );
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  bandColor(b: number): string {
+    const ramp = [
+      '#14532d',
+      '#16a34a',
+      '#65a30d',
+      '#ca8a04',
+      '#ea580c',
+      '#dc2626',
+      '#9f1239',
+      '#6b21a8',
+      '#1e1b4b',
+    ];
+    return ramp[Math.min(ramp.length - 1, Math.max(0, Math.round(b / 5) - 1))];
+  }
+
+  get reachBands(): number[] {
+    return Array.from({ length: Math.ceil(this.driveMin / 5) }, (_, i) =>
+      Math.min((i + 1) * 5, this.driveMin),
+    );
+  }
+
+  /** White halo + dark dashes around high-risk zones that are not reached. */
+  private drawGapOutlines(): void {
+    this.outside(() => {
+      this.gapLayer?.remove();
+      this.gapLayer = undefined;
+      if (!this.coverageOn) return;
+      const gaps = this.features.filter(
+        (f) => classify(scoreOf(f.properties)) <= 1 && this.isGap(f.properties),
+      );
+      if (!gaps.length) return;
+      const fc = { type: 'FeatureCollection', features: gaps } as FeatColl;
+      const common = {
+        pane: 'coveragePane',
+        interactive: false,
+        pointToLayer: strayPoint,
+      };
+      this.gapLayer = L.layerGroup([
+        L.geoJSON(fc, {
+          ...common,
+          style: { fill: false, color: '#ffffff', weight: 4.5, opacity: 0.9 },
+        }),
+        L.geoJSON(fc, {
+          ...common,
+          style: {
+            fill: false,
+            color: '#111827',
+            weight: 2,
+            opacity: 1,
+            dashArray: '6 4',
+          },
+        }),
+      ]).addTo(this.map);
+    });
+  }
+
+  /** Debounced, so dragging the slider doesn't send a request per step. */
+  private scheduleReachRoads(): void {
+    clearTimeout(this.reachTimer);
+    this.reachReq?.unsubscribe();
+    if (!this.coverageOn || !this.byRoad) {
+      this.outside(() => {
+        this.reachLayer?.remove();
+        this.reachLayer = undefined;
+      });
+      return;
+    }
+    this.reachTimer = setTimeout(() => {
+      const pts = this.hypo.map((m): [number, number] => [
+        m.getLatLng().lat,
+        m.getLatLng().lng,
+      ]);
+      this.reachReq = this.api.getAccessRoads(this.driveMin, pts).subscribe({
+        next: (fc) =>
+          this.outside(() => {
+            this.reachLayer?.remove();
+            this.reachLayer = L.geoJSON(fc, {
+              pane: 'reachPane',
+              interactive: false,
+              pointToLayer: strayPoint,
+              style: (f) => ({
+                renderer: (this.reachRenderer ??= L.canvas({
+                  pane: 'reachPane',
+                })),
+                color: this.bandColor(f?.properties?.['band'] ?? 15),
+                weight: 2.6,
+                opacity: 0.95,
+              }),
+            }).addTo(this.map);
+          }),
+        error: () => {},
+      });
+    }, 300);
   }
 }

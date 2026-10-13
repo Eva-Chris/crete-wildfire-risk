@@ -22,6 +22,17 @@ export interface WeatherResponse {
   stations: Station[];
 }
 
+export interface AccessResponse {
+  available: boolean;
+  max_min?: number;
+  zone_buffer_m?: number;
+  n_zones?: number;
+  n_settlements?: number;
+  zones?: (number | null)[]; // minutes, indexed by the zone's `zid`
+  settlements?: (number | null)[]; // minutes, same order as the settlements layer
+  snap_m?: number[];
+}
+
 export interface FwiStation {
   id: number;
   name: string;

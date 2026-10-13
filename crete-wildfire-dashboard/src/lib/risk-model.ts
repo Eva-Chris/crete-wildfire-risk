@@ -111,7 +111,13 @@ export const COLOR_OPTIONS: { id: ColorBy; label: string; hint: string }[] = [
 ];
 
 /** Sequential purple ramp for single factors, so it can't be mistaken for the red-green risk ramp. */
-export const FACTOR_RAMP = ['#f1eef6', '#d7b5d8', '#df65b0', '#dd1c77', '#980043'];
+export const FACTOR_RAMP = [
+  '#f1eef6',
+  '#d7b5d8',
+  '#df65b0',
+  '#dd1c77',
+  '#980043',
+];
 
 /* ---------------- factor breakdown for the zone popup ---------------- */
 
@@ -138,7 +144,7 @@ const FACTOR_META: Record<
     label: 'Aspect (SW-facing)',
     value: (p) =>
       !isNum(p['aspect_deg'])
-        ? '—'
+        ? '-'
         : isNum(p['aspect_str']) && p['aspect_str'] < 0.3
           ? 'mixed or mostly flat'
           : `faces ${compass(p['aspect_deg'])}`,
@@ -156,12 +162,14 @@ const FACTOR_META: Record<
     label: 'Fire history',
     // f_history = 100 when HISTORY_FULL_AT (50 %) of the zone burned, so share = score / 2
     value: (p) =>
-      isNum(p['f_history']) ? `~${(p['f_history'] * 0.5).toFixed(0)}% burned` : '—',
+      isNum(p['f_history'])
+        ? `~${(p['f_history'] * 0.5).toFixed(0)}% burned`
+        : '-',
   },
   wui: {
     label: 'Next to settlements (WUI)',
     // is_wui can arrive as "0" / "False" strings, which are truthy; use the numeric factor instead
-    value: (p) => (!isNum(p['f_wui']) ? '—' : p['f_wui'] >= 50 ? 'Yes' : 'No'),
+    value: (p) => (!isNum(p['f_wui']) ? '-' : p['f_wui'] >= 50 ? 'Yes' : 'No'),
   },
 };
 

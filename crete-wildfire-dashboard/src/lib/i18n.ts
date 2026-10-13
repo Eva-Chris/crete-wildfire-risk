@@ -31,6 +31,32 @@ const EL: Record<string, string> = {
     'Ο Δείκτης Καιρού Πυρκαγιάς δεν είναι διαθέσιμος. Ελέγξτε ότι το API εκτελείται.',
   'Fire Weather Index': 'Δείκτης Καιρού Πυρκαγιάς',
 
+  // ---- drive-time coverage ----
+  'Distance measure': 'Τρόπος μέτρησης απόστασης',
+  'By road': 'Οδικώς',
+  'Straight line': 'Ευθεία γραμμή',
+  'Drive time': 'Χρόνος οδήγησης',
+  '{gaps} of {high} high or very high risk zones cannot be reached by road from a fire station within {min} minutes.':
+    '{gaps} από {high} ζώνες υψηλού ή πολύ υψηλού κινδύνου δεν είναι προσβάσιμες οδικώς από πυροσβεστικό σταθμό εντός {min} λεπτών.',
+  'Dashed outlines on the map mark those zones. Drive times follow public roads at assumed fire-engine speeds and exclude call handling and crew turnout. A zone with no road within {m} m counts as not reached.':
+    'Τα διακεκομμένα περιγράμματα στον χάρτη επισημαίνουν αυτές τις ζώνες. Οι χρόνοι οδήγησης ακολουθούν τους δημόσιους δρόμους με υποθετικές ταχύτητες πυροσβεστικών οχημάτων και δεν περιλαμβάνουν την παραλαβή της κλήσης και την ετοιμασία του πληρώματος. Μια ζώνη χωρίς δρόμο σε απόσταση {m} m θεωρείται μη προσβάσιμη.',
+  'High or very high risk forest within 1 km of each settlement centre. Covered means a fire station within {min} minutes by road, including proposed stations.':
+    'Δάσος υψηλού ή πολύ υψηλού κινδύνου σε απόσταση έως 1 km από το κέντρο κάθε οικισμού. «Καλυμμένος» σημαίνει πυροσβεστικός σταθμός σε απόσταση έως {min} λεπτά οδικώς, συμπεριλαμβανομένων των προτεινόμενων σταθμών.',
+  'Drive time to nearest station': 'Χρόνος οδήγησης έως τον πλησιέστερο σταθμό',
+  'Status at {min} min': 'Κατάσταση στα {min} λεπτά',
+  'Drive time (min)': 'Χρόνος οδήγησης (min)',
+  'Drive time limit (min)': 'Όριο χρόνου οδήγησης (min)',
+  'Drive times along OpenStreetMap roads at assumed fire-engine speeds. High risk = top two percentile classes of the score.':
+    'Χρόνοι οδήγησης σε δρόμους του OpenStreetMap με υποθετικές ταχύτητες πυροσβεστικών οχημάτων. Υψηλός κίνδυνος = οι δύο ανώτερες εκατοστημοριακές κατηγορίες του δείκτη.',
+  'A proposed station is more than 500 m from the nearest road, so its drive times include a slow off-road leg.':
+    'Ένας προτεινόμενος σταθμός απέχει πάνω από 500 m από τον πλησιέστερο δρόμο, επομένως οι χρόνοι του περιλαμβάνουν ένα αργό τμήμα εκτός δρόμου.',
+  'Could not compute drive times for the proposed stations.':
+    'Δεν ήταν δυνατός ο υπολογισμός χρόνων οδήγησης για τους προτεινόμενους σταθμούς.',
+
+  '>{n} min': '>{n} λεπτά',
+  '{n} min': '{n} λεπτά',
+  '{n} km': '{n} χλμ',
+
   // weather station names
   Chania: 'Χανιά',
   Sfakia: 'Σφακιά',

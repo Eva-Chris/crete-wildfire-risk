@@ -132,10 +132,31 @@
             </button>
 
             @if (coverageOn) {
+            @if (roadAvailable) {
+            <div class="segmented" role="tablist" [attr.aria-label]="tr('Distance measure')">
+                <button role="tab" [class.active]="reachMode === 'road'" (click)="setReachMode('road')">{{ tr('By road')
+                    }}</button>
+                <button role="tab" [class.active]="reachMode === 'line'" (click)="setReachMode('line')">{{ tr('Straight
+                    line') }}</button>
+            </div>
+            }
+
+            @if (byRoad) {
+            <label class="sliders single">
+                <span>{{ tr('Drive time') }} <b>{{ driveMin }} min</b></span>
+                <input type="range" min="5" [max]="roadMax" step="1" [value]="driveMin" (input)="onDriveMin($event)" />
+            </label>
+            <div class="reach-legend">
+                @for (b of reachBands; track b) {
+                <span><i [style.background]="bandColor(b)"></i>≤ {{ b }} min</span>
+                }
+            </div>
+            } @else {
             <label class="sliders single">
                 <span>{{ tr('Response radius') }} <b>{{ coverageKm }} km</b></span>
                 <input type="range" min="2" max="30" step="1" [value]="coverageKm" (input)="onCoverageKm($event)" />
             </label>
+            }
 
             <div class="presets">
                 <button [class.active]="placing" (click)="togglePlacing()">
@@ -143,6 +164,8 @@
                 </button>
                 @if (hypo.length) { <button (click)="clearHypo()">{{ tr('Clear ({n})', { n: hypo.length }) }}</button> }
             </div>
+            @if (roadWarn) { <p class="hint">{{ tr(roadWarn) }}</p> }
+
             @if (hypo.length && coverage.known) {
             <div class="gap-card ok"
                 [innerHTML]="trHtml('Proposed stations cover {n} more high-risk zones ({was} → {now} uncovered).', { n: coverage.baseGaps - coverage.gaps, was: coverage.baseGaps, now: coverage.gaps }, ['n'])">
@@ -151,10 +174,15 @@
 
             @if (coverage.known) {
             <div class="gap-card" [class.ok]="coverage.gaps === 0"
-                [innerHTML]="trHtml('{gaps} of {high} high or very high risk zones are farther than {km} km from a fire station.', { gaps: coverage.gaps, high: coverage.high, km: coverageKm }, ['gaps'])">
+                [innerHTML]="byRoad
+        ? trHtml('{gaps} of {high} high or very high risk zones cannot be reached by road from a fire station within {min} minutes.', { gaps: coverage.gaps, high: coverage.high, min: driveMin }, ['gaps'])
+        : trHtml('{gaps} of {high} high or very high risk zones are farther than {km} km from a fire station.', { gaps: coverage.gaps, high: coverage.high, km: coverageKm }, ['gaps'])">
             </div>
-            <p class="hint">{{ tr('Dashed outlines on the map mark those zones. Distances are straight-line, not by
-                road.') }}</p>
+            <p class="hint">{{ byRoad
+                ? tr('Dashed outlines on the map mark those zones. Drive times follow public roads at assumed
+                fire-engine speeds and exclude call handling and crew turnout. A zone with no road within {m} m counts
+                as not reached.', { m: roadBuffer })
+                : tr('Dashed outlines on the map mark those zones. Distances are straight-line, not by road.') }}</p>
             } @else {
             <p class="hint">{{ tr('Waiting for station data. If this stays, restart the API so it adds distances to the
                 zones.') }}</p>
@@ -168,9 +196,11 @@
                 <h2>{{ tr('Settlement exposure') }}</h2>
                 @if (exposure.length) { <span class="status">{{ tr('{n} exposed', { n: exposure.length }) }}</span> }
             </div>
-            <p class="hint">{{ tr('High or very high risk forest within 1 km of each settlement centre. Covered means a
-                fire station within {km} km in a straight line, including proposed stations.', { km: coverageKm }) }}
-            </p>
+            <p class="hint">{{ byRoad
+                ? tr('High or very high risk forest within 1 km of each settlement centre. Covered means a fire station
+                within {min} minutes by road, including proposed stations.', { min: driveMin })
+                : tr('High or very high risk forest within 1 km of each settlement centre. Covered means a fire station
+                within {km} km in a straight line, including proposed stations.', { km: coverageKm }) }}</p>
             <div class="presets">
                 <button [class.active]="onlyUncovered" (click)="toggleUncovered()">{{ tr('Uncovered only') }}</button>
                 <button (click)="exportCSV()">{{ tr('Export CSV') }}</button>
@@ -180,11 +210,16 @@
                 @for (r of exposureShown; track r.id) {
                 <li>
                     <button (click)="flyToSettlement(r)">
-                        <span class="e-name">{{ r.name }}</span>
+                        <span class="e-name">{{ r.name || tr('Settlement') }}</span>
                         <span class="e-bar"><i [style.width.%]="r.share * 100"></i></span>
                         <span class="e-ha">{{ r.ha.toFixed(0) }} ha</span>
                         <span class="e-chip" [class.ok]="r.covered">
-                            {{ r.covered ? tr('covered') : r.stationKm.toFixed(0) + ' km' }}
+                            {{ r.covered ? tr('covered')
+                            : r.byRoad
+                            ? (r.stationMin === null
+                            ? tr('>{n} min', { n: roadMax })
+                            : tr('{n} min', { n: r.stationMin.toFixed(0) }))
+                            : tr('{n} km', { n: r.stationKm.toFixed(0) }) }}
                         </span>
                     </button>
                 </li>

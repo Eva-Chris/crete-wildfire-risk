@@ -17,20 +17,23 @@ import re
 import threading
 import time
 from datetime import datetime
+from functools import lru_cache
 from pathlib import Path
 from typing import NamedTuple
 from zoneinfo import ZoneInfo
 
 import geopandas as gpd
+import numpy as np
 import pandas as pd
 import requests
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import Response
 
 from common import parse_fire_dates
 from fwi import compute_fwi
+from routing import RoadNet, point_times, to_minutes, zone_times
 from stations import STATIONS, nearest_station_ids
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -132,6 +135,7 @@ def weather_endpoint(refresh: bool = False):
 _fwi_cache: dict = {"t": 0.0, "data": None, "retry_at": 0.0}
 _fwi_lock = threading.Lock()
 EMPTY_FWI = {"live": False, "stale": False, "in_season": True, "stations": []}
+
 
 @app.get("/api/fwi")
 def fwi_endpoint(refresh: bool = False):
@@ -276,23 +280,37 @@ def get_model():
 
 
 FOREST_COLS = [
-    "gid", "static_risk_score", "old_score", "elev_m",
+    "zid", "gid", "static_risk_score", "old_score", "elev_m",
     "mean_slope", "dist_power_m", "dist_roads_m", "is_wui", "dist_fire_m",
     "f_fuel", "f_slope", "f_aspect", "f_history", "f_power", "f_roads", "f_wui",
     "dominant_clc", "dominant_clc_pct", "aspect_deg", "aspect_str",
 ]
 
 
+def load_zones() -> gpd.GeoDataFrame | None:
+    """The scored zones, numbered 0..n-1 in `zid`.
+
+    /api/risk-zones and the drive-time answers both start from here, so the browser can look up
+    a zone's drive time by its zid and be sure they refer to the same zone.
+    """
+    gdf = read_geo(DATA_DIR / FOREST_FILE)
+    if gdf is None:
+        return None
+    gdf = gdf.reset_index(drop=True)
+    gdf["zid"] = gdf.index
+    return gdf
+
+
 @app.get("/api/risk-zones")
 def get_risk_zones():
     """
-    Static forest zones as GeoJSON. Each zone carries its factor scores, `station_id`
-    (nearest weather station) and `dist_fire_m` (distance to the nearest fire station).
+    Static forest zones as GeoJSON. Each zone carries its factor scores, `zid`, `station_id`
+    (nearest weather station) and `dist_fire_m` (straight-line distance to the nearest fire station).
     """
     if FOREST_FILE in _layer_cache:
         return geojson_response(_layer_cache[FOREST_FILE])
 
-    gdf = read_geo(DATA_DIR / FOREST_FILE)
+    gdf = load_zones()
     if gdf is None:
         return geojson_response(EMPTY)
 
@@ -342,6 +360,159 @@ def get_burned_areas():
 
 
 # --------------------------------------------------------------------------- #
+# Drive-time coverage (needs data/road_graph.npz from build_road_network.py)
+# --------------------------------------------------------------------------- #
+ROAD_FILE = DATA_DIR / "data/road_graph.npz"
+ACCESS_MAX_MIN = 45          # search limit: anything slower counts as "not reached"
+ZONE_ACCESS_BUFFER_M = 250   # a zone is reached through road nodes within this distance of it
+MAX_PROPOSED = 10            # the map should stop letting the user place stations at this number too
+
+
+class AccessState(NamedTuple):
+    net: RoadNet
+    zone_idx: np.ndarray     # zone positions ...
+    zone_node: np.ndarray    # ... and the road nodes that serve them
+    n_zones: int
+    s_node: np.ndarray       # nearest road node of each settlement
+    s_snap: np.ndarray       # and the distance to it in metres
+    base: dict               # drive times from the existing fire stations
+    node_t: np.ndarray | None = None   # drive seconds from existing stations to every road node
+    edges: tuple | None = None         # (lon, lat, u, v): unique undirected road segments
+
+
+def _centroids_lonlat(gdf: gpd.GeoDataFrame) -> tuple[np.ndarray, np.ndarray]:
+    c = gdf.to_crs(METRIC_CRS).geometry.centroid.to_crs(4326)
+    return c.x.to_numpy(), c.y.to_numpy()
+
+
+def _pack(st: AccessState, node_t: np.ndarray) -> dict:
+    return {
+        "zones": to_minutes(zone_times(node_t, st.zone_idx, st.zone_node, st.n_zones), ACCESS_MAX_MIN),
+        "settlements": to_minutes(point_times(node_t, st.s_node, st.s_snap), ACCESS_MAX_MIN),
+    }
+
+
+@lru_cache(maxsize=1)
+def _access_state() -> AccessState | None:
+    """Road graph plus everything that doesn't change between requests. None if the graph isn't built."""
+    if not ROAD_FILE.exists():
+        log.warning("%s not found - run build_road_network.py for drive-time coverage", ROAD_FILE)
+        return None
+    zones = load_zones()
+    stations = read_geo(DATA_DIR / FIRE_STATIONS_FILE)
+    if zones is None or stations is None:
+        return None
+
+    net = RoadNet.load(ROAD_FILE)
+    zone_idx, zone_node = net.zone_node_pairs(zones, ZONE_ACCESS_BUFFER_M)
+
+    # Settlements in the order the /api/settlements layer serves them (the map matches them by position)
+    spec = LAYERS["settlements"]
+    feats = json.loads(load_layer(spec.files, spec.tolerance_m, spec.power, spec.kinds))["features"]
+    if feats:
+        s_lon, s_lat = _centroids_lonlat(gpd.GeoDataFrame.from_features(feats, crs=4326))
+        s_node, s_snap = net.snap(s_lon, s_lat)
+    else:
+        s_node, s_snap = np.array([], dtype=int), np.array([])
+
+    f_lon, f_lat = _centroids_lonlat(stations)
+    # Same method as proposed stations (including the off-road leg to the nearest road),
+    # so an existing and a proposed station that stand in the same place get the same times.
+    node_t, f_snap = net.times_from_points(f_lon, f_lat, ACCESS_MAX_MIN * 60)
+    if (f_snap > 1000).any():
+        log.warning("%d fire station(s) are more than 1 km from the nearest road", int((f_snap > 1000).sum()))
+
+    g = np.load(ROAD_FILE)
+    lon, lat = g["lon"], g["lat"]
+    lo, hi = np.minimum(g["u"], g["v"]), np.maximum(g["u"], g["v"])
+    # two-way roads are stored as two directed edges: keep one of each pair
+    _, keep = np.unique(lo.astype(np.int64) * len(lon) + hi, return_index=True)
+    edges = (lon, lat, lo[keep], hi[keep])
+
+    st = AccessState(net, zone_idx, zone_node, len(zones), s_node, s_snap, {}, node_t, edges)
+    st = st._replace(base=_pack(st, node_t))
+    log.info("Road access ready: %d zones, %d settlements, %d fire stations", len(zones), len(s_node), len(f_lon))
+    return st
+
+
+@app.get("/api/access")
+def access_base():
+    """Drive times (minutes) from the existing fire stations to every zone and settlement."""
+    st = _access_state()
+    if st is None:
+        return {"available": False}
+    return {"available": True, "max_min": ACCESS_MAX_MIN, "zone_buffer_m": ZONE_ACCESS_BUFFER_M,
+            "n_zones": st.n_zones, "n_settlements": len(st.s_node), **st.base}
+
+def _parse_points(p: list[str]) -> tuple[list[float], list[float]]:
+    if len(p) > MAX_PROPOSED:
+        raise HTTPException(status_code=422, detail=f"At most {MAX_PROPOSED} proposed stations")
+    lats, lons = [], []
+    for s in p:
+        try:
+            la, lo = (float(x) for x in s.split(","))
+        except ValueError:
+            raise HTTPException(status_code=422, detail=f"Bad point: {s!r}")
+        if not (33.8 <= la <= 36.7 and 22.4 <= lo <= 27.4):
+            raise HTTPException(status_code=422, detail="Point outside Crete")
+        lats.append(la)
+        lons.append(lo)
+    return lats, lons
+
+
+@app.get("/api/access/proposed")
+def access_proposed(p: list[str] = Query(default=[])):
+    """Drive times from proposed stations. Each `p` is 'lat,lng' (at most MAX_PROPOSED)."""
+    st = _access_state()
+    if st is None:
+        raise HTTPException(status_code=503, detail="Road network not built")
+    lats, lons = _parse_points(p)
+    base = {"available": True, "n_zones": st.n_zones, "n_settlements": len(st.s_node)}
+    if not lats:
+        return {**base, "zones": [None] * st.n_zones, "settlements": [None] * len(st.s_node), "snap_m": []}
+    node_t, snap = st.net.times_from_points(lons, lats, ACCESS_MAX_MIN * 60)
+    return {**base, **_pack(st, node_t), "snap_m": [round(float(d)) for d in snap]}
+
+
+_roads_cache: dict[int, str] = {}
+
+
+@app.get("/api/access/roads")
+def access_roads(max_min: int = Query(15, ge=1, le=ACCESS_MAX_MIN), p: list[str] = Query(default=[])):
+    """Road segments reachable from the fire stations (existing + proposed `p`) within max_min,
+    as MultiLineString features with a `band` property (5-minute steps)."""
+    st = _access_state()
+    if st is None or st.node_t is None or st.edges is None:
+        raise HTTPException(status_code=503, detail="Road network not built")
+    if not p and max_min in _roads_cache:
+        return geojson_response(_roads_cache[max_min])
+
+    node_t = st.node_t
+    lats, lons = _parse_points(p)
+    if lats:
+        extra, _ = st.net.times_from_points(lons, lats, ACCESS_MAX_MIN * 60)
+        node_t = np.minimum(node_t, extra)
+
+    lon, lat, ea, eb = st.edges
+    t = np.maximum(node_t[ea], node_t[eb])          # a segment is reached when both ends are
+    ok = np.isfinite(t) & (t <= max_min * 60)
+    ea, eb, t = ea[ok], eb[ok], t[ok]
+    band = np.minimum(np.maximum(np.ceil(t / 300) * 5, 5), max_min).astype(int)
+
+    feats = []
+    for bnd in np.unique(band):
+        m = band == bnd
+        segs = np.stack([np.column_stack([lon[ea[m]], lat[ea[m]]]),
+                         np.column_stack([lon[eb[m]], lat[eb[m]]])], axis=1).round(5)
+        feats.append({"type": "Feature", "properties": {"band": int(bnd)},
+                      "geometry": {"type": "MultiLineString", "coordinates": segs.tolist()}})
+    body = json.dumps({"type": "FeatureCollection", "features": feats}, separators=(",", ":"))
+    if not p:
+        _roads_cache[max_min] = body
+    return geojson_response(body)
+
+
+# --------------------------------------------------------------------------- #
 # Simple file-backed layers: one table instead of one function per layer
 # --------------------------------------------------------------------------- #
 POINTS = {"Point", "MultiPoint"}
@@ -378,3 +549,8 @@ def _make_handler(spec: LayerSpec):
 
 for _route, _spec in LAYERS.items():
     app.add_api_route(f"/api/{_route}", _make_handler(_spec), methods=["GET"], name=_route)
+
+try:
+    _access_state()          # build it now rather than on the first request
+except Exception:
+    log.exception("Road access could not be prepared")

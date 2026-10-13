@@ -95,4 +95,4 @@ _(Note: Spatial data and external layers maintain their own respective licences 
 
 ## Author
 
-- Eva Chrysostomaki — _Initial work & development_ — [GitHub Profile](https://github.com/Eva-Chris)
+- Eva Chrysostomaki - _Initial work & development_ - [GitHub Profile](https://github.com/Eva-Chris)

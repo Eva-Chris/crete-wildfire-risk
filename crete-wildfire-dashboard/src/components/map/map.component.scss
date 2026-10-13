@@ -48,6 +48,23 @@ app-map .dashboard-container {
       outline: 2px solid var(--focus);
       outline-offset: 2px;
     }
+
+    .reach-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 10px;
+      margin-top: 10px;
+      font-size: 0.72rem;
+      color: var(--ink-2);
+      i {
+        display: inline-block;
+        width: 16px;
+        height: 4px;
+        margin-right: 4px;
+        border-radius: 2px;
+        vertical-align: middle;
+      }
+    }
   }
 
   /* ============ Sidebar ============ */
@@ -950,7 +967,7 @@ app-map {
 }
 .expo button {
   display: grid;
-  grid-template-columns: 1fr 48px 52px 62px;
+  grid-template-columns: minmax(0, 1fr) 40px 48px 104px;
   gap: 8px;
   align-items: center;
   width: 100%;
@@ -983,6 +1000,9 @@ app-map {
 }
 .expo .e-chip {
   text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   border-radius: 10px;
   padding: 1px 6px;
   background: #fee2e2;

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { AccessResponse, FeatColl } from '../lib/types';
 
 @Injectable({
   providedIn: 'root',
@@ -72,5 +73,28 @@ export class RiskDataService {
     return this.http.get<any>(`${this.apiUrl}/fwi`, {
       params: refresh ? { refresh: 'true' } : {},
     });
+  }
+
+  getAccess(): Observable<AccessResponse> {
+    return this.http.get<AccessResponse>(`${this.apiUrl}/access`);
+  }
+
+  getAccessProposed(points: [number, number][]): Observable<AccessResponse> {
+    return this.http.get<AccessResponse>(`${this.apiUrl}/access/proposed`, {
+      params: {
+        p: points.map(([la, ln]) => `${la.toFixed(5)},${ln.toFixed(5)}`),
+      },
+    });
+  }
+
+  getAccessRoads(
+    maxMin: number,
+    pts: [number, number][],
+  ): Observable<FeatColl> {
+    const q = [
+      `max_min=${maxMin}`,
+      ...pts.map(([la, ln]) => `p=${la},${ln}`),
+    ].join('&');
+    return this.http.get<FeatColl>(`${this.apiUrl}/access/roads?${q}`);
   }
 }

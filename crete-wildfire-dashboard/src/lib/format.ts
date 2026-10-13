@@ -17,7 +17,7 @@ export const esc = (v: unknown) =>
   );
 
 export const fmt = (v: unknown, digits = 0, unit = '') =>
-  isNum(v) ? v.toFixed(digits) + unit : '—';
+  isNum(v) ? v.toFixed(digits) + unit : '-';
 
 const COMPASS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
 export const compass = (deg: number): string =>
@@ -25,4 +25,4 @@ export const compass = (deg: number): string =>
 
 /** 0 m means the zone touches or contains the feature, so say that instead of "0 m". */
 export const distText = (v: unknown, what: string): string =>
-  !isNum(v) ? '—' : v < 1 ? `${what} touches the zone` : fmt(v, 0, ' m');
+  !isNum(v) ? '-' : v < 1 ? `${what} touches the zone` : fmt(v, 0, ' m');
