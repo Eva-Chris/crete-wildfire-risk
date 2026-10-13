@@ -1,0 +1,809 @@
+@if (langService.currentLang() === 'el') {
+<div class="docs">
+    <nav class="toc">
+        <a class="back" routerLink="/">← Επιστροφή στον χάρτη</a>
+        <button class="lang-btn" (click)="langService.toggleLanguage()">
+            🌐 {{ langService.currentLang() === 'el' ? 'Ελληνικά' : 'English' }}
+        </button>
+        <h2>Περιεχόμενα</h2>
+        @for (s of getSections(); track s.id) {
+        <a [href]="'#' + s.id" (click)="go(s.id, $event)">{{ s.title }}</a>
+        }
+    </nav>
+
+    <main class="content">
+        <h1>Πώς λειτουργεί αυτό το εργαλείο</h1>
+        <p class="lead">
+            Ένα εργαλείο σχεδιασμού που κατατάσσει τις δασικές ζώνες της Κρήτης με βάση τη σχετική ευπάθεια
+            σε πυρκαγιές και δείχνει πού η κάλυψη των πυροσβεστικών σταθμών είναι περιορισμένη. Αυτή η σελίδα
+            εξηγεί τι κάνει, πώς κατασκευάστηκε και τι δεν μπορεί να προβλέψει.
+        </p>
+
+        <div class="callout warn">
+            <strong>Πεδίο εφαρμογής.</strong> Αυτό είναι ένα εργαλείο σχεδιασμού και όχι σύστημα επιχειρησιακής
+            προειδοποίησης ή πρόβλεψης έναρξης πυρκαγιών. Για επίσημες ειδοποιήσεις και κίνδυνο πυρκαγιάς,
+            χρησιμοποιήστε τις υπηρεσίες της Πολιτικής Προστασίας (112) και το EFFIS.
+        </div>
+
+        <section id="overview">
+            <h2>Τι είναι αυτό το εργαλείο</h2>
+            <p>Ο χάρτης αποτελείται από τρία μέρη που λειτουργούν συνδυαστικά:</p>
+            <ul>
+                <li><b>Ζώνες κινδύνου.</b> Περίπου 1.300 δασικές ζώνες, καθεμία με έναν στατικό δείκτη ευπάθειας από 0
+                    έως 100.</li>
+                <li><b>Κάλυψη ανταπόκρισης.</b> Ποιες ζώνες υψηλού κινδύνου απέχουν πολύ από κάποιον πυροσβεστικό
+                    σταθμό,
+                    και τι αλλάζει αν προσθέσετε έναν προτεινόμενο σταθμό.</li>
+                <li><b>Έκθεση οικισμών.</b> Ποιους οικισμoύς περιβάλλει το περισσότερο δάσος υψηλού κινδύνου,
+                    και αν αυτοί καλύπτονται επαρκώς.</li>
+            </ul>
+            <p>
+                Ως «ευπάθεια» νοείται το πού είναι πιο πιθανό να καούν οι εκτάσεις αν εκδηλωθεί πυρκαγιά.
+                Δεν αποτελεί πρόβλεψη για το πού ή πότε θα ξεκινήσουν πυρκαγιές.
+            </p>
+        </section>
+
+        <section id="score">
+            <h2>Ο στατικός δείκτης κινδύνου</h2>
+            <p>
+                Κάθε ζώνη λαμβάνει επτά επιμέρους βαθμολογίες παραγόντων από 0 έως 100 (οι υψηλότερες τιμές σημαίνουν
+                μεγαλύτερο κίνδυνο).
+                Ο στατικός δείκτης είναι το σταθμισμένο άθροισμά τους.
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Παράγων</th>
+                        <th>Βάρος</th>
+                        <th>Τρόπος βαθμολόγησης</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (w of weights(); track w.key) {
+                    <tr>
+                        <td>{{ getLabel(w.key).name }}</td>
+                        <td>{{ w.pct }}%</td>
+                        <td>{{ getLabel(w.key).how }}</td>
+                    </tr>
+                    } @empty {
+                    <tr>
+                        <td colspan="3">
+                            @switch (status()) {
+                            @case ('loading') { Φόρτωση βαρών… }
+                            @case ('error') { Δεν ήταν δυνατή η επικοινωνία με το API. Βεβαιωθείτε ότι εκτελείται στη
+                            θύρα 8000. }
+                            @default { Το API δεν επέστρεψε βάρη. Εκτελέστε το build_static_risk.py για να δημιουργήσετε
+                            το model.json. }
+                            }
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+
+            <h3>Βαθμολογία καυσίμου (Fuel)</h3>
+            <p>
+                Οι βαθμολογίες καυσίμου προέκυψαν με την επικάλυψη της κάλυψης γης CORINE 2012 στις καμένες εκτάσεις
+                του EFFIS από το 2016 έως το {{ trainEnd() }}. Για κάθε κατηγορία κάλυψης γης μετρήθηκε το ποσοστό της
+                έκτασής της
+                που κάηκε, συγκρίθηκε με τον μέσο όρο και μετατράπηκε αυτή η αναλογία σε κλίμακα 0-100.
+                Κατηγορίες με πολύ μικρή έκταση προσαρμόστηκαν προς τον μέσο όρο για να αποφευχθούν ακραίες τιμές
+                (θόρυβος).
+                Κατηγορίες που καλύπτουν λιγότερο από 10 km² εντός των ζωνών ήταν πολύ μικρές για να αξιολογηθούν από τα
+                δεδομένα
+                και λαμβάνουν μια προεπιλεγμένη τιμή ανάλογα με την ομάδα CORINE (20 για δασικές και ημιδασικές
+                εκτάσεις,
+                40 για αγροτικές). Τρεις τιμές ορίστηκαν χειροκίνητα:
+            </p>
+            <ul>
+                <li><b>Κωνοφόρο δάσος: 50.</b> Η τραχεία πεύκη είναι εξαιρετικά εύφλεκτη, και η απουσία
+                    πυρκαγιών σε έξι χρόνια οφείλεται πιθανώς στην τύχη.</li>
+                <li><b>Γυμνός βράχος: 5.</b> Σχεδόν καθόλου συνεχής καύσιμη ύλη.</li>
+                <li><b>Καμένη έκταση: 15.</b> Πολύ λίγη καύσιμη ύλη απομένει μετά από πρόσφατη πυρκαγιά.</li>
+            </ul>
+            <p>
+                Ο χάρτης του 2012 χρησιμοποιήθηκε επειδή προηγείται χρονικά όλων των πυρκαγιών που χρησιμοποιήθηκαν για
+                την επικύρωση.
+                Ένας νεότερος χάρτης θα έδειχνε ήδη κάποια καμένη γη ως «καμένη» ή «αραιή βλάστηση», διαστρεβλώνοντας το
+                αποτέλεσμα του παράγοντα καυσίμου.
+            </p>
+
+            <h3>Κατηγορίες κινδύνου</h3>
+            <p>
+                Οι κατηγορίες βασίζονται σε εκατοστημοριακές ζώνες (percentile bands) του στατικού δείκτη σε όλες τις
+                ζώνες
+                @if (breaks().length === 4) {
+                (με όρια στα {{ breaks()[0] }}, {{ breaks()[1] }}, {{ breaks()[2] }} και {{ breaks()[3] }})
+                }.
+                Εξ ορισμού, το 20% των ζωνών κατατάσσεται πάντα ως «Πολύ υψηλό» και το 20% ως «Πολύ χαμηλό».
+                Οι κατηγορίες δείχνουν <b>σχετική κατάταξη</b> και όχι απόλυτο επίπεδο κινδύνου.
+            </p>
+        </section>
+
+        <section id="weather">
+            <h2>Κίνδυνος λόγω καιρού (Fire Weather)</h2>
+            <p>
+                Ο κίνδυνος από τον καιρό απεικονίζεται με τον <b>Καναδικό Δείκτη Καιρού Πυρκαγιάς (FWI)</b>, το σύστημα
+                που χρησιμοποιεί το EFFIS.
+                Σε αντίθεση με μια απλή μέτρηση θερμοκρασίας και ανέμου, ο δείκτης παρακολουθεί την ξηρασία της καύσιμης
+                ύλης
+                καθ' όλη τη διάρκεια της περιόδου: τις πρόσφατες βροχοπτώσεις και το στέγνωμα της λεπτής καύσιμης ύλης,
+                της δασικής στρώσης και των βαθύτερων στρωμάτων. Μια ζεστή και θυελλώδης μέρα μετά από βροχή σκοράρει
+                χαμηλότερα
+                από την ίδια μέρα μετά από μια μακρά περίοδο ξηρασίας.
+            </p>
+            <ul>
+                <li>Υπολογίζεται σε οκτώ μετεωρολογικούς σταθμούς με βάση τα δεδομένα μεσημβρινού καιρού του Open-Meteo,
+                    τρέχοντας μέρα με τη μέρα από την 1η Μαρτίου, συν μια σύντομη πρόγνωση.</li>
+                <li>Κάθε ζώνη συνδέεται με τον πλησιέστερο σταθμό της και το αναδυόμενο παράθυρό (popup) εμφανίζει τον
+                    δείκτη του σταθμού αυτού.</li>
+                <li>Εμφανίζεται <b>ξεχωριστά</b> και δεν τροποποιεί τον δείκτη ευπάθειας. Η ευπάθεια δείχνει πού η
+                    πυρκαγιά θα βρει
+                    καύσιμη ύλη και κατάλληλο ανάγλυφο, ενώ ο δείκτης FWI δείχνει πόσο επικίνδυνος είναι ο καιρός
+                    σήμερα.</li>
+                <li>Αν η υπηρεσία καιρού δεν είναι προσβάσιμη, ο χάρτης συνεχίζει να εμφανίζει τις τελευταίες έγκυρες
+                    τιμές που έλαβε,
+                    αντί να δημιουργεί τεχνητές μετρήσεις.</li>
+            </ul>
+            <div class="callout warn">
+                <strong>Περιορισμοί.</strong> Τα μετεωρολογικά δεδομένα προέρχονται από ένα αδρό πλέγμα οκτώ σημείων,
+                οπότε οι τοπικές συνθήκες σε ορεινά εδάφη μπορεί να διαφέρουν σημαντικά. Ο υπολογισμός ξεκινά από
+                τυπικές ανοιξιάτικες τιμές,
+                οι οποίες ενδέχεται να μην ταιριάζουν σε κάθε έτος. Χρησιμοποιήστε τα επίσημα προϊόντα του EFFIS και της
+                Πολιτικής Προστασίας για προειδοποιήσεις.
+            </div>
+        </section>
+
+        <section id="reliability">
+            <h2>Πόσο αξιόπιστο είναι;</h2>
+
+            <h3>Στατικός δείκτης ευπάθειας</h3>
+            <p>
+                Το μοντέλο δοκιμαστήκε σε μελλοντικά δεδομένα: το ιστορικό πυρκαγιών και η καύσιμη ύλη βασίστηκαν σε
+                πυρκαγιές έως το
+                {{ trainEnd() }}, και στη συνέχεια ο δείκτης συγκρίθηκε με το πού εκδηλώθηκαν πυρκαγιές μεταγενέστερα
+                ({{ trainEnd() + 1 }} και έπειτα). Μια ζώνη θεωρήθηκε ότι «καήκε» εάν κάηκε τουλάχιστον το 5% της
+                έκτασής της.
+            </p>
+            @if (validation(); as v) {
+            <table>
+                <thead>
+                    <tr>
+                        <th>Μέτρο</th>
+                        <th>AUC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (r of validationRows(); track r.label) {
+                    <tr>
+                        <td>{{ r.label }}</td>
+                        <td>{{ r.auc.toFixed(2) }}</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+            <p class="small">Η τιμή AUC είναι 0.5 για τυχαία επιλογή (κορώνα-γράμματα) και 1.0 για τέλεια κατάταξη.
+                Αυτές οι τιμές παράγονται αυτόματα από το script δόμησης κάθε φορά που ανασυγκροτείται το μοντέλο.</p>
+            <p><b>Πώς να διαβάσετε τα αποτελέσματα:</b></p>
+            <ul>
+                <li>Συγκρίνετε την πρώτη γραμμή με τις υπόλοιπες. Ένα μοντέλο που δεν υπερέχει του καλύτερου μεμονωμένου
+                    παράγοντα
+                    ή της προηγούμενης έκδοσης δεν προσθέτει ουσιαστική αξία.</li>
+                <li>Μόνο {{ v.n_positive }} από τις {{ v.n_zones }} ζώνες κάηκαν την περίοδο δοκιμής, επομένως η
+                    αβεβαιότητα είναι
+                    μεγάλη (περίπου ±0.1). Μικρές διαφορές μεταξύ των γραμμών δεν είναι στατιστικά σημαντικές.</li>
+                <li>Ένας παράγοντας κοντά στο 0.5 δεν έχει προβλεπτική ικανότητα από μόνος του. Η καύσιμη ύλη είναι
+                    τυπικό παράδειγμα:
+                    η φρυγανώδης βλάστηση (maquis) καλύπτει το μεγαλύτερο μέρος των ζωνών, οπότε υπάρχει ελάχιστη
+                    αντίθεση μεταξύ τους.</li>
+                <li>Τα βάρη αποτελούν εμπειρικές εκτιμήσεις ειδικών και δεν προσαρμόστηκαν βάσει των πυρκαγιών δοκιμής,
+                    διατηρώντας την αξιοπιστία του τεστ.</li>
+            </ul>
+            } @else {
+            <p>Τα αποτελέσματα επικύρωσης δεν είναι διαθέσιμα. Εκτελέστε το <code>build_static_risk.py</code> έχοντας
+                διαθέσιμο
+                το αρχείο καμένων εκτάσεων για να τα δημιουργήσετε.</p>
+            }
+
+            <h3>Δείκτης Καιρού Πυρκαγιάς (FWI)</h3>
+            <p>
+                Ελέγξαμε κατά πόσον ο δείκτης FWI διαχώριζε τις ημέρες με μεγάλες χαρτογραφημένες πυρκαγιές από άλλες
+                καλοκαιρινές ημέρες
+                (Ιούνιος έως Σεπτέμβριος, από το 2016 και μετά, σε 8 σταθμούς· συνολικά 38 ημέρες πυρκαγιάς). Ο
+                διαχωρισμός ήταν ασθενής
+                (AUC 0.64), παρόμοιος με έναν απλό δείκτη θερμοκρασίας, ανέμου και υγρασίας (0.65). Με τόσες λίγες
+                ημέρες πυρκαγιάς,
+                η διαφορά εμπίπτει στα όρια αβεβαιότητας. Χρησιμοποιούμε το FWI επειδή αποτελεί το καθιερωμένο πρότυπο
+                του EFFIS
+                και όχι επειδή αποδείχθηκε πιο ακριβές εδώ. Το καλοκαίρι στην Κρήτη ο δείκτης βρίσκεται στο επίπεδο
+                «Υψηλό» τις περισσότερες ημέρες,
+                οπότε χρησιμοποιήστε τον για σύγκριση ημερών και περιοχών και όχι ως συναγερμό πυρκαγιάς.
+                (Αυτά τα στοιχεία προέρχονται από το <code>validate_fwi.py</code>· εκτελέστε το ξανά αν αλλάξουν τα
+                δεδομένα.)
+            </p>
+        </section>
+
+        <section id="coverage">
+            <h2>Κάλυψη ανταπόκρισης</h2>
+            <p>
+                Μια ζώνη υψηλού κινδύνου (κατηγορίας High ή Very high) θεωρείται <b>καλυμμένη</b> εάν οποιοδήποτε τμήμα
+                της
+                βρίσκεται εντός της επιλεγμένης ακτίνας από κάποιον πυροσβεστικό σταθμό. Οι ζώνες που βρίσκονται εκτός
+                ακτίνας
+                εμφανίζονται με διακεκομμένο περίγραμμα.
+            </p>
+            <p>
+                <b>Προτεινόμενοι σταθμοί.</b> Ενεργοποιήστε την επιλογή «Εμβέλεια πυροσβεστικού σταθμού», πατήστε
+                «Προσθήκη προτεινόμενου σταθμού»
+                και κάντε κλικ στον χάρτη. Σύρετε τον δείκτη για να τον μετακινήσετε ή κάντε κλικ πάνω του για να τον
+                διαγράψετε.
+                Το πάνελ εμφανίζει πόσες ζώνες υψηλού κινδύνου καλύπτουν οι νέοι σταθμοί. Οι προτεινόμενοι σταθμοί δεν
+                αποθηκεύονται μόνιμα.
+            </p>
+            <div class="callout">
+                <strong>Απόσταση ευθείας γραμμής.</strong> Οι αποστάσεις αγνοούν το οδικό δίκτυο, τα βουνά και τον
+                πραγματικό χρόνο ταξιδιού.
+                Στο ορεινό ανάγλυφο της Κρήτης ένας σταθμός μπορεί να φαίνεται κοντά στον χάρτη αλλά μακριά οδικώς.
+                Αντιμετωπίστε τους αριθμούς ως μια πρώτη διαλογή (screening) και όχι ως ακριβή εκτίμηση χρόνου
+                απόκρισης.
+            </div>
+        </section>
+
+        <section id="exposure">
+            <h2>Έκθεση οικισμών</h2>
+            <p>
+                Για κάθε οικισμό, το εργαλείο αναλύει κύκλο ακτίνας 1 km γύρω από το κέντρο του και μετράει ποιο ποσοστό
+                αυτού αποτελείται από δάσος υψηλού ή πολύ υψηλού κινδύνου. Οι οικισμοί κατατάσσονται βάσει αυτού του
+                ποσοστού,
+                και καθένας λαμβάνει κατάσταση κάλυψης (καλυμμένος/μη καλυμμένος) βάσει της απόστασης ευθείας γραμμής
+                από τον πλησιέστερο σταθμό (συμπεριλαμβανομένων των προτεινόμενων).
+            </p>
+            <ul>
+                <li>Τα εκτάρια είναι κατά προσέγγιση (δειγματοληψία σε πλέγμα 125 m), οπότε χρησιμοποιήστε τα για
+                    κατάταξη και όχι για ακριβή μέτρηση.</li>
+                <li>Οι οικισμοί μετρώνται από το κεντρικό τους σημείο, οπότε οι μεγαλύτερες πόλεις ενδέχεται να
+                    υποεκτιμώνται.</li>
+                <li>Η εξαγωγή σε αρχείο Excel περιλαμβάνει ένα δεύτερο φύλλο εργασίας με τις ρυθμίσεις του σεναρίου.
+                </li>
+            </ul>
+        </section>
+
+        <section id="data">
+            <h2>Πηγές δεδομένων</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Επίπεδο (Layer)</th>
+                        <th>Πηγή</th>
+                        <th>Σημειώσεις</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Κάλυψη γης</td>
+                        <td>Copernicus CORINE Land Cover 2012 (V2020_20u1)</td>
+                        <td>Ελάχιστη μονάδα χαρτογράφησης 25 ha</td>
+                    </tr>
+                    <tr>
+                        <td>Καμένες εκτάσεις</td>
+                        <td>EFFIS (European Forest Fire Information System)</td>
+                        <td>Πυρκαγιές περίπου 30 ha και άνω· από 2016 και έπειτα</td>
+                    </tr>
+                    <tr>
+                        <td>Ανάγλυφο (Terrain)</td>
+                        <td>EU-DEM (Copernicus Digital Elevation Model), επαναδειγματοληψία στα 25 m</td>
+                        <td>Υπολογισμός κλίσης και προσανατολισμού μέσω QGIS</td>
+                    </tr>
+                    <tr>
+                        <td>Καιρός & Δείκτης FWI</td>
+                        <td>Open-Meteo.com (CC BY 4.0)</td>
+                        <td>Δωρεάν API, για μη εμπορική χρήση</td>
+                    </tr>
+                    <tr>
+                        <td>Δίκτυα ηλεκτρικής ενέργειας (γραμμές μεταφοράς), οδοποιία, οικισμοί, πυροσβεστικοί σταθμοί,
+                            υδροληψίες, ελικοδρόμια
+                        </td>
+                        <td>© Συνεισφέροντες OpenStreetMap, ODbL / Περιφέρεια Κρήτης (data.gov.gr)</td>
+                        <td>Τρέχον στιγμιότυπο (εξαγωγή μέσω Overpass Turbo / Περιφερειακής πύλης GIS)</td>
+                    </tr>
+                    <tr>
+                        <td>Χάρτες βάσης (Basemaps)</td>
+                        <td>OpenTopoMap (εδάφους), Esri World Imagery (δορυφορικός)</td>
+                        <td>Η αναφορά πηγής εμφανίζεται στον χάρτη</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="small">
+                Περιλαμβάνει πληροφορίες της Υπηρεσίας Παρακολούθησης Land Monitoring Service του Copernicus, ©
+                Ευρωπαϊκή Ένωση, EEA.
+            </p>
+        </section>
+
+        <section id="limits">
+            <h2>Περιορισμοί</h2>
+            <ul>
+                <li><b>Σχετικοί και όχι απόλυτοι δείκτες.</b> Οι κατηγορίες εκατοστημορίων επισημαίνουν πάντα σταθερό
+                    ποσοστό ζωνών.</li>
+                <li><b>Μικρό ιστορικό πυρκαγιών.</b> Το ιστορικό και η καύσιμη ύλη προέρχονται από περίπου έξι χρόνια
+                    πυρκαγιών.</li>
+                <li><b>Απουσία μικρών πυρκαγιών.</b> Το EFFIS χαρτογραφεί μόνο μεγαλύτερες πυρκαγιές, οπότε οι μικρές
+                    απουσιάζουν από εκπαίδευση και έλεγχο.</li>
+                <li><b>Χωρίς μοντέλο έναρξης ή εξάπλωσης.</b> Ο δείκτης δείχνει πού η φωτιά θα βρει καύσιμη ύλη και
+                    ανάγλυφο, όχι πού θα ξεκινήσει.</li>
+                <li><b>Οι υποδομές είναι στιγμιότυπο.</b> Δίκτυα, δρόμοι και οικισμοί είναι τρέχοντα, ενώ οι πυρκαγιές
+                    είναι ιστορικά δεδομένα.</li>
+                <li><b>Η κάλυψη γης είναι από το 2012.</b> Μπορεί να διαφέρει από τη σημερινή βλάστηση.</li>
+                <li><b>Κάλυψη ευθείας γραμμής.</b> Δεν λαμβάνεται υπόψη το οδικό δίκτυο ή ο χρόνος οδήγησης επί του
+                    παρόντος.</li>
+                <li><b>Ασθενής επικύρωση καιρού.</b> Ο δείκτης FWI διαχώριζε ασθενώς τις ημέρες πυρκαγιάς από τις
+                    υπόλοιπες καλοκαιρινές ημέρες.</li>
+                <li><b>Μόνο για την Κρήτη.</b> Το μοντέλο δεν έχει δοκιμαστεί σε άλλες περιοχές.</li>
+            </ul>
+        </section>
+
+        <section id="faq">
+            <h2>Συχνές Ερωτήσεις (FAQ)</h2>
+
+            <details>
+                <summary>Σημαίνει μια ζώνη «Πολύ υψηλού» κινδύνου ότι αναμένεται πυρκαγιά εκεί σύντομα;</summary>
+                <p>Όχι. Σημαίνει ότι η ζώνη κατατάσσεται στο ανώτερο πέμπτο της Κρήτης με βάση τους συνδυασμένους
+                    παράγοντες.
+                    Είναι σχετική κατάταξη για σχεδιασμό και όχι πιθανότητα ή προειδοποίηση.</p>
+            </details>
+
+            <details>
+                <summary>Γιατί ακριβώς το 20% των ζωνών είναι πάντα «Πολύ υψηλού» κινδύνου;</summary>
+                <p>Οι κατηγορίες βασίζονται σε εκατημοριακές ζώνες, οπότε καθεμία περιέχει σταθερό ποσοστό περιοχών.
+                    Αυτό κάνει τον χάρτη εύκολο στην ανάγνωση, αλλά σημαίνει ότι οι κατηγορίες δεν δείχνουν αν ολόκληρο
+                    το νησί
+                    είναι ασφαλές ή επικίνδυνο μια συγκεκριμένη ημέρα.</p>
+            </details>
+
+            <details>
+                <summary>Γιατί ο παράγοντας καυσίμου έχει βάρος αν έδειξε μηδενική προβλεψιμότητα;</summary>
+                <p>Τα βάρη είναι εμπειρικές τιμές που ορίστηκαν πριν από τον έλεγχο και δεν τροποποιήθηκαν εκ των
+                    υστέρων,
+                    καθώς κάτι τέτοιο θα ακύρωνε την εγκυρότητα του τεστ. Απαιτείται μεγαλύτερο ιστορικό πυρκαγιών για
+                    την ακριβή βαθμονόμησή τους.</p>
+            </details>
+
+            <details>
+                <summary>Αλλάζει ο καιρός τις κατηγορίες κινδύνου;</summary>
+                <p>Όχι. Οι κατηγορίες δείχνουν τη στατική ευπάθεια και παραμένουν αμετάβλητες όλο τον χρόνο.
+                    Ο δείκτης FWI εμφανίζεται δίπλα τους, ώστε να διαβάζετε συνδυαστικά: πού θα καεί εύκολα η ύλη,
+                    και πόσο επικίνδυνος είναι ο καιρός σήμερα.</p>
+            </details>
+
+            <details>
+                <summary>Τι σημαίνει η τιμή του Δείκτη Καιρού Πυρκαγιάς (FWI);</summary>
+                <p>Είναι μια σχετική κλίμακα αναμενόμενης έντασης πυρκαγιάς, από πολύ χαμηλή έως ακραία.
+                    Τιμές άνω του 21 θεωρούνται τυπικά υψηλές ή μεγαλύτερες, σύμφωνα με τις κλάσεις του EFFIS. Δεν
+                    αποτελεί πιθανότητα εκδήλωσης πυρκαγιάς.</p>
+            </details>
+
+            <details>
+                <summary>Τι σημαίνει ακριβώς ότι μια περιοχή είναι «καλυμμένη»;</summary>
+                <p>Για τις ζώνες, σημαίνει ότι οποιοδήποτε τμήμα τους βρίσκεται εντός της ακτίνας του σταθμού.
+                    Για τους οικισμούς, ότι το κέντρο του οικισμού βρίσκεται εντός της ακτίνας. Και οι δύο περιπτώσεις
+                    χρησιμοποιούν απόσταση ευθείας γραμμής.</p>
+            </details>
+
+            <details>
+                <summary>Μπορώ να χρησιμοποιήσω αυτό το εργαλείο για επίσημες αποφάσεις;</summary>
+                <p>Χρησιμοποιήστε το για υποστήριξη συζητήσεων, όπως πού θα μπορούσε να βοηθήσει ένας πυροσβεστικός
+                    κρουνός,
+                    μια υδροδεξαμενή ή ένας σταθμός.
+                    Δεν έχει αξιολογηθεί από επαγγελματίες του πυροσβεστικού σώματος, γι' αυτό επιβεβαιώστε οποιαδήποτε
+                    απόφαση με τοπική γνώση και επίσημα δεδομένα.</p>
+            </details>
+
+            <details>
+                <summary>Αποθηκεύονται οι προτεινόμενοι σταθμοί που προσθέτω;</summary>
+                <p>Όχι. Υπάρχουν μόνο στην καρτέλα του προγράμματος περιήγησής σας έως ότου κάνετε ανανέωση (reload).
+                    Εξάγετε το αρχείο Excel για να διατηρήσετε τα αποτελέσματα του σεναρίου.</p>
+            </details>
+
+            <details>
+                <summary>Γιατί λείπει ένας οικισμός από τη λίστα έκθεσης;</summary>
+                <p>Η λίστα περιλαμβάνει μόνο οικισμούς που έχουν δάσος υψηλού ή πολύ υψηλού κινδύνου σε ακτίνα 1 km.
+                    Οικισμοί χωρίς τέτοια γειτνίαση εξαιρούνται.</p>
+            </details>
+
+            <details>
+                <summary>Μπορώ να δω πώς προέκυψε η βαθμολογία μιας μεμονωμένης ζώνης;</summary>
+                <p>Ναι. Κάντε κλικ σε οποιαδήποτε ζώνη για να δείτε τους πόντους κάθε παράγοντα, την ακατέργαστη τιμή
+                    πίσω από αυτούς
+                    και το ποσοστό συνεισφοράς τους στη συνολική βαθμολογία.</p>
+            </details>
+
+            <details>
+                <summary>Πώς μπορώ να αναπαραγάγω ή να ενημερώσω το μοντέλο;</summary>
+                <p>Η διαδικασία υπολογισμού είναι ένα script Python (<code>build_static_risk.py</code>) που διαβάζει τις
+                    προετοιμασμένες ζώνες,
+                    το ανάγλυφο, την κάλυψη γης και τις καμένες εκτάσεις, και στη συνέχεια γράφει τις βαθμολογημένες
+                    ζώνες και ένα αρχείο
+                    <code>model.json</code> το οποίο διαβάζει η εφαρμογή. Το README στο GitHub εξηγεί πώς να το
+                    εκτελέσετε.
+                </p>
+            </details>
+        </section>
+
+        <footer class="small">Τελευταία ενημέρωση: <i>Οκτώβριος 2026</i> · Έκδοση 2.0 · Δημιουργός: <i>Εύα
+                Χρυσοστομάκη</i></footer>
+    </main>
+</div>
+} @else {
+<div class="docs">
+    <nav class="toc">
+        <a class="back" routerLink="/">← Back to map</a>
+        <button class="lang-btn" (click)="langService.toggleLanguage()">
+            🌐 {{ langService.currentLang() === 'el' ? 'Ελληνικά' : 'English' }}
+        </button>
+        <h2>Contents</h2>
+        @for (s of getSections(); track s.id) {
+        <a [href]="'#' + s.id" (click)="go(s.id, $event)">{{ s.title }}</a>
+        }
+    </nav>
+
+    <main class="content">
+        <h1>How this tool works</h1>
+        <p class="lead">
+            A planning aid that ranks Cretan forest zones by relative wildfire susceptibility and shows
+            where fire station coverage is thin. This page explains what it does, how it was built, and
+            what it cannot tell you.
+        </p>
+
+        <div class="callout warn">
+            <strong>Scope.</strong> This is a planning aid, not an operational warning or ignition
+            forecast. For official alerts and fire danger, use the Civil Protection services (112) and
+            EFFIS.
+        </div>
+
+        <section id="overview">
+            <h2>What this tool is</h2>
+            <p>The map has three parts that work together:</p>
+            <ul>
+                <li><b>Risk zones.</b> About 1,300 forest zones, each with a static susceptibility score from 0 to 100.
+                </li>
+                <li><b>Response coverage.</b> Which high-risk zones are far from a fire station, and what changes if you
+                    add a proposed one.</li>
+                <li><b>Settlement exposure.</b> Which settlements have the most high-risk forest around them, and
+                    whether they are covered.</li>
+            </ul>
+            <p>
+                "Susceptibility" means where fires are more likely to burn if they start. It is not a
+                prediction of where fires will start or when.
+            </p>
+        </section>
+
+        <section id="score">
+            <h2>The static risk score</h2>
+            <p>
+                Each zone gets seven factor scores from 0 to 100 (higher means more risk). The static score
+                is their weighted sum.
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Factor</th>
+                        <th>Weight</th>
+                        <th>How it is scored</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (w of weights(); track w.key) {
+                    <tr>
+                        <td>{{ getLabel(w.key).name }}</td>
+                        <td>{{ w.pct }}%</td>
+                        <td>{{ getLabel(w.key).how }}</td>
+                    </tr>
+                    } @empty {
+                    <tr>
+                        <td colspan="3">
+                            @switch (status()) {
+                            @case ('loading') { Loading weights… }
+                            @case ('error') { Could not reach the API. Check that it is running on port 8000. }
+                            @default { The API returned no weights. Run build_static_risk.py to create model.json. }
+                            }
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+
+            <h3>Fuel scores</h3>
+            <p>
+                Fuel scores were derived by overlaying CORINE 2012 land cover on EFFIS burnt areas from
+                2016 to {{ trainEnd() }}. For each land-cover class we measured the share of its area that
+                burned, compared it with the average, and converted that ratio to 0-100. Classes with a
+                small area were pulled toward the average to avoid noise. Classes covering less than 10 km²
+                inside the zones were too small to score from the data at all, and use a default for their
+                CORINE group instead (20 for forest and semi-natural classes, 40 for agricultural ones).
+                Three scores were set by hand and are declared here:
+            </p>
+            <ul>
+                <li><b>Conifer forest: 50.</b> Calabrian pine is highly flammable, and zero burns in six years is likely
+                    chance.</li>
+                <li><b>Bare rock: 5.</b> Almost no continuous fuel.</li>
+                <li><b>Burnt area: 15.</b> Little fuel is left after a recent fire.</li>
+            </ul>
+            <p>
+                The 2012 map was used because it predates all the fires used for calibration. A later map
+                would already show some burned land as "burnt" or "sparse vegetation", which would leak the
+                answer into the fuel factor.
+            </p>
+
+            <h3>Risk classes</h3>
+            <p>
+                Classes are percentile bands of the static score across all zones
+                @if (breaks().length === 4) {
+                (breaks at {{ breaks()[0] }}, {{ breaks()[1] }}, {{ breaks()[2] }} and {{ breaks()[3] }})
+                }.
+                By construction, 20% of zones are always "Very high" and 20% "Very low". Classes show
+                <b>relative ranking</b>, not an absolute level of danger.
+            </p>
+        </section>
+
+        <section id="weather">
+            <h2>Fire weather</h2>
+            <p>
+                Weather danger is shown with the <b>Canadian Fire Weather Index (FWI)</b>, the system used by EFFIS.
+                Unlike a single reading of temperature and wind, it follows fuel dryness through the season: recent
+                rain, and the drying of fine fuels, forest litter and deeper layers. A hot windy day after rain scores
+                lower than the same day after a long dry spell.
+            </p>
+            <ul>
+                <li>Calculated at eight stations from Open-Meteo noon weather, run day by day from 1 March, plus a short
+                    forecast.</li>
+                <li>Each zone is linked to its nearest station, and its popup shows that station's index.</li>
+                <li>It is <b>shown separately</b> and does not change the susceptibility score. Susceptibility says
+                    where fire would find fuel and terrain. FWI says how dangerous the weather is today.</li>
+                <li>If the weather service cannot be reached, the map keeps showing the last values it received and
+                    says so, rather than inventing readings.</li>
+            </ul>
+            <div class="callout warn">
+                <strong>Limits.</strong> Weather comes from a coarse grid at eight points, so local conditions in
+                mountain terrain can differ a lot. The calculation starts from standard spring values, which may
+                not suit every year. Use the official EFFIS and Civil Protection products for warnings.
+            </div>
+        </section>
+
+        <section id="reliability">
+            <h2>How reliable is it?</h2>
+
+            <h3>Static susceptibility score</h3>
+            <p>
+                The model was tested on the future: fire history and fuel were built from fires up to
+                {{ trainEnd() }}, then the score was compared with where fires burned afterwards
+                ({{ trainEnd() + 1 }} onward). A zone counted as "burned" if at least 5% of it burned.
+            </p>
+            @if (validation(); as v) {
+            <table>
+                <thead>
+                    <tr>
+                        <th>Measure</th>
+                        <th>AUC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (r of validationRows(); track r.label) {
+                    <tr>
+                        <td>{{ r.label }}</td>
+                        <td>{{ r.auc.toFixed(2) }}</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+            <p class="small">AUC is 0.5 for a coin flip and 1.0 for a perfect ranking. These numbers are written by
+                the build script each time the model is rebuilt.</p>
+            <p><b>How to read this:</b></p>
+            <ul>
+                <li>Read the first row against the others. A model that does no better than its best single factor,
+                    or than the previous version, has not added much.</li>
+                <li>Only {{ v.n_positive }} of {{ v.n_zones }} zones burned in the test period, so the uncertainty is
+                    wide (roughly ±0.1). Small differences between rows are not meaningful.</li>
+                <li>A factor near 0.5 has no skill on its own. Fuel is the usual example: maquis covers most of the
+                    zone area, so there is little contrast between zones, and the burn rates rest on a small number of
+                    fires.</li>
+                <li>Weights are expert placeholders and were not tuned on the test fires, so the test stays fair.</li>
+            </ul>
+            } @else {
+            <p>Validation results are not available. Run <code>build_static_risk.py</code> with the burnt-area file
+                present to create them.</p>
+            }
+
+            <h3>Fire Weather Index</h3>
+            <p>
+                We checked whether the Fire Weather Index separated days with a large mapped fire from other
+                summer days (June to September, 2016 onward, eight stations; 38 fire days). It did so only weakly
+                (AUC 0.64), about the same as a simple temperature, wind and humidity index (0.65). With so few
+                fire days the difference is within the uncertainty. We use the FWI because it is the standard
+                used by EFFIS, not because it was shown to be more accurate here. In Crete's summer the index is
+                in the "High" range on most days, so use it to compare days and places, not as a fire alarm.
+                (These figures come from <code>validate_fwi.py</code>; re-run it if the data changes.)
+            </p>
+        </section>
+
+        <section id="coverage">
+            <h2>Response coverage</h2>
+            <p>
+                A high-risk zone (High or Very high class) counts as <b>covered</b> if any part of it lies
+                within the chosen radius of a fire station. Zones beyond the radius are outlined with a
+                dashed border.
+            </p>
+            <p>
+                <b>Proposed stations.</b> Turn on "Fire station reach", press "Add proposed station" and
+                click the map. Drag a marker to move it, click it to remove it. The panel shows how many
+                high-risk zones the new stations cover. Proposed stations are not saved.
+            </p>
+            <div class="callout">
+                <strong>Straight-line distance.</strong> Distances ignore roads, mountains and travel time.
+                In Crete's terrain a station can be close on the map and far by road. Treat the numbers as
+                a first screening, not a response-time estimate.
+            </div>
+        </section>
+
+        <section id="exposure">
+            <h2>Settlement exposure</h2>
+            <p>
+                For each settlement, the tool samples the 1 km circle around its centre and measures how
+                much of it is High or Very high risk forest. Settlements are ranked by that share, and each
+                gets a covered or uncovered status based on the straight-line distance to the nearest
+                station, including proposed ones.
+            </p>
+            <ul>
+                <li>Hectares are approximate (sampled on a 125 m grid), so use them for ranking, not measurement.</li>
+                <li>Settlements are measured from their centre point, so large towns are understated.</li>
+                <li>The export to Excel includes a second sheet recording the scenario settings.</li>
+            </ul>
+        </section>
+
+        <section id="data">
+            <h2>Data sources</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Layer</th>
+                        <th>Source</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Land cover</td>
+                        <td>Copernicus CORINE Land Cover 2012 (V2020_20u1)</td>
+                        <td>25 ha minimum mapping unit</td>
+                    </tr>
+                    <tr>
+                        <td>Burned areas</td>
+                        <td>EFFIS (European Forest Fire Information System)</td>
+                        <td>Fires of roughly 30 ha and larger; 2016 onward</td>
+                    </tr>
+                    <tr>
+                        <td>Terrain</td>
+                        <td>EU-DEM (Copernicus Digital Elevation Model), resampled to 25 m</td>
+                        <td>Slope and aspect derived via QGIS raster analysis</td>
+                    </tr>
+                    <tr>
+                        <td>Weather and Fire Weather Index</td>
+                        <td>Open-Meteo.com (CC BY 4.0)</td>
+                        <td>Free API, non-commercial use</td>
+                    </tr>
+                    <tr>
+                        <td>Power lines, roads, settlements, fire stations, water points, helipads</td>
+                        <td>© OpenStreetMap contributors, ODbL / Region of Crete (data.gov.gr)</td>
+                        <td>Current snapshot (extracted via Overpass Turbo / Regional GIS portal)</td>
+                    </tr>
+                    <tr>
+                        <td>Base maps</td>
+                        <td>OpenTopoMap (terrain), Esri World Imagery (satellite)</td>
+                        <td>Attribution shown on the map</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="small">
+                Contains Copernicus Land Monitoring Service information, © European Union, EEA.
+            </p>
+        </section>
+
+        <section id="limits">
+            <h2>Limitations</h2>
+            <ul>
+                <li><b>Relative, not absolute.</b> Percentile classes always flag a fixed share of zones.</li>
+                <li><b>Short fire record.</b> Fire history and fuel come from about six years of fires.</li>
+                <li><b>Small fires are missing.</b> EFFIS maps only larger fires, so small fires are absent from both
+                    training and testing.</li>
+                <li><b>No ignition or spread model.</b> The score says where fire would find fuel and terrain, not where
+                    it will start.</li>
+                <li><b>Infrastructure is a snapshot.</b> Power lines, roads and settlements are current, while the fires
+                    are historical.</li>
+                <li><b>Land cover is from 2012.</b> It may differ from today's vegetation.</li>
+                <li><b>Straight-line coverage.</b> No road network or travel time yet.</li>
+                <li><b>Weak fire-weather validation.</b> The Fire Weather Index only weakly separated fire days from
+                    other summer days (see above).</li>
+                <li><b>Crete only.</b> The model was not tested elsewhere.</li>
+            </ul>
+        </section>
+
+        <section id="faq">
+            <h2>FAQ</h2>
+
+            <details>
+                <summary>Does a "Very high" zone mean a fire is likely there soon?</summary>
+                <p>No. It means the zone ranks in the top fifth of Crete on the combined factors. It is a relative
+                    ranking for planning, not a probability or a warning.</p>
+            </details>
+
+            <details>
+                <summary>Why are exactly 20% of zones always "Very high"?</summary>
+                <p>The classes are percentile bands, so each holds a fixed share of zones. That makes the map easy to
+                    read, but it means the classes cannot tell you whether the island as a whole is safe or dangerous on
+                    a given day.</p>
+            </details>
+
+            <details>
+                <summary>Why does the fuel factor have a weight if it showed no skill?</summary>
+                <p>The weights are expert placeholders set before testing, and they were deliberately not changed after
+                    seeing the test results, because that would make the test meaningless. A longer fire record is
+                    needed to calibrate them properly.</p>
+            </details>
+
+            <details>
+                <summary>Does the weather change the risk classes?</summary>
+                <p>No. Classes show static susceptibility and stay the same all year. The Fire Weather Index is shown
+                    beside them, so you can read both: where fire would burn easily, and how dangerous today's weather
+                    is.</p>
+            </details>
+            <details>
+                <summary>What does the Fire Weather Index number mean?</summary>
+                <p>It is a relative scale of expected fire intensity, from very low to extreme. Values above about 21
+                    are typically considered high or more, using the EFFIS classes. It is not a probability of a fire.
+                </p>
+            </details>
+
+            <details>
+                <summary>What does "covered" mean exactly?</summary>
+                <p>For zones, any part of the zone is within the radius of a station. For settlements, the settlement
+                    centre is within the radius. Both use straight-line distance.</p>
+            </details>
+
+            <details>
+                <summary>Can I use this for official decisions?</summary>
+                <p>Use it to support discussion, such as where a hydrant, water tank or station might help. It has not
+                    been reviewed by fire-service professionals, so confirm any decision with local knowledge and
+                    official data.</p>
+            </details>
+
+            <details>
+                <summary>Are my proposed stations saved?</summary>
+                <p>No. They exist only in your browser tab until you reload. Export the Excel file to keep the scenario
+                    results.</p>
+            </details>
+
+            <details>
+                <summary>Why is a settlement missing from the exposure list?</summary>
+                <p>The list only includes settlements with some High or Very high risk forest within 1 km. Settlements
+                    with none are left out.</p>
+            </details>
+
+            <details>
+                <summary>Can I see how a single zone's score was made?</summary>
+                <p>Yes. Click any zone to see each factor's points, the raw value behind it and its share of the total
+                    score.</p>
+            </details>
+
+            <details>
+                <summary>How can I reproduce or update the model?</summary>
+                <p>The scoring pipeline is a Python script (<code>build_static_risk.py</code>) that reads the prepared
+                    zones, the terrain, land cover and burned areas, then writes the scored zones and a
+                    <code>model.json</code> file the app reads. The README in the repository explains how to run it
+                    and how the input zones were prepared.
+                </p>
+            </details>
+        </section>
+
+        <footer class="small">Last updated: <i>October 2026</i> · Version 2.0 · Created by <b>Eva Chrysostomaki</b>
+        </footer>
+    </main>
+</div>
+}

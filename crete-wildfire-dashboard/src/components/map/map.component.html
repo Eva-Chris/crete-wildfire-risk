@@ -1,0 +1,296 @@
+<div class="dashboard-container" [class.collapsed]="!sidebarOpen">
+    <aside class="sidebar">
+        <header class="brand">
+            <span class="logo" aria-hidden="true">🔥</span>
+            <div class="brand-text">
+                <h1>{{ tr('Crete wildfire risk') }}</h1>
+                <p>{{ tr("Static susceptibility and today's Fire Weather Index") }}</p>
+            </div>
+            <div class="brand-actions">
+                <a class="docs-link" routerLink="/docs" target="_blank" [title]="tr('How this tool works')">{{ tr('Docs
+                    ↗') }}</a>
+                <button class="lang-btn" (click)="langService.toggleLanguage()">
+                    🌐 {{ langService.currentLang() === 'el' ? 'Ελληνικά' : 'English' }}
+                </button>
+            </div>
+        </header>
+
+        @if (error) {
+        <button class="alert" (click)="error = null">
+            <span>{{ error }}</span>
+            <em>{{ tr('Dismiss') }}</em>
+        </button>
+        }
+
+        <!-- ===================== Fire weather ===================== -->
+        <section class="block">
+            <div class="block-head">
+                <h2>{{ tr('Fire weather') }}</h2>
+                @if (fwi && fwi.live && fwi.stations.length) {
+                <span class="status live">{{ tr('FWI for {date}', { date: fwi.stations[0].date }) }}</span>
+                }
+                <button class="icon-btn" [disabled]="fwiLoading" [class.spin]="fwiLoading"
+                    (click)="refreshFireWeather()" [title]="tr('Refresh')"
+                    [attr.aria-label]="tr('Refresh fire weather')">⟳</button>
+            </div>
+
+            @if (weatherStale) {
+            <p class="hint">{{ tr('The weather service did not answer the last refresh, so these are the last values it
+                returned.') }}</p>
+            }
+
+            @if (fwiLoading && !fwi) {
+            <p class="hint">{{ tr("Computing the Fire Weather Index from this season's weather. The first load can take
+                several seconds.") }}</p>
+            } @else if (fwi && fwi.stations.length) {
+            @if (fwiSummary; as s) {
+            <div class="danger">
+                <div class="danger-top">
+                    <span class="mult">{{ s.max.toFixed(0) }}</span>
+                    <span class="level" [style.color]="s.cls.color">{{ tr('{level} (highest station)', { level:
+                        tr(s.cls.label) }) }}</span>
+                </div>
+            </div>
+            }
+            @if (!fwi.in_season) {
+            <p class="hint">{{ tr('Outside the usual fire season. The index is shown for reference only.') }}</p>
+            }
+            <ul class="stations">
+                @for (st of fwi.stations; track st.id) {
+                <li>
+                    <button (click)="flyToFwiStation(st)">
+                        <span class="st-name">{{ tr(st.name) }}</span>
+                        <span class="st-data">{{ forecastText(st) }}</span>
+                        <span class="st-chip" [style.background]="fwiClassOf(st.fwi).color">{{ st.fwi.toFixed(0)
+                            }}</span>
+                    </button>
+                </li>
+                }
+            </ul>
+            <p class="hint">{{ tr("Canadian Fire Weather Index at noon, with the next days after the arrows. It
+                describes today's weather danger and does not change the susceptibility scores. Zone popups show the
+                nearest station.") }}</p>
+            } @else {
+            <p class="hint">{{ tr('Fire Weather Index unavailable. Check that the API is running.') }}</p>
+            }
+        </section>
+
+        <!-- ===================== Risk summary / legend ===================== -->
+        <section class="block">
+            <label class="field">
+                <span>{{ tr('Color zones by') }}</span>
+                <select class="select" (change)="setColorBy($event)">
+                    @for (o of colorOptions; track o.id) {
+                    <option [value]="o.id" [selected]="o.id === colorBy">{{ tr(o.label) }}</option>
+                    }
+                </select>
+            </label>
+
+            @if (colorBy === 'score') {
+            <div class="stack" aria-hidden="true">
+                @for (c of stats; track c.label; let i = $index) { @if (!isHidden(i)) {
+                <span [style.flex]="c.count" [style.background]="c.color"></span>
+                } }
+            </div>
+            <ul class="classes">
+                @for (c of stats; track c.label; let i = $index) {
+                <li>
+                    <button [class.off]="isHidden(i)" (click)="toggleClass(i)"
+                        [title]="isHidden(i) ? tr('Show this class') : tr('Hide this class')">
+                        <span class="dot" [style.background]="c.color"></span>
+                        <span class="c-name">{{ tr(c.label) }}<small>{{ tr(c.range) }}</small></span>
+                        <span class="c-pct">{{ c.pct.toFixed(0) }}%</span>
+                        <span class="c-count">{{ c.count }}</span>
+                    </button>
+                </li>
+                }
+            </ul>
+            <p class="hint">{{ tr('Select a class to hide or show it on the map.') }}</p>
+            } @else {
+            <div class="ramp">
+                @for (c of factorRamp; track c) { <span [style.background]="c"></span> }
+            </div>
+            <div class="ramp-scale"><span>0</span><span>{{ tr('factor score') }}</span><span>100</span></div>
+            <p class="hint">{{ tr(colorHint) }}</p>
+            }
+        </section>
+
+        <!-- ===================== Response coverage ===================== -->
+        <section class="block">
+            <div class="block-head">
+                <h2>{{ tr('Response coverage') }}</h2>
+                @if (coverageOn && coverage.known) {
+                <span class="status">{{ tr('{pct}% of high-risk zones uncovered', { pct: coverage.pct.toFixed(0) })
+                    }}</span>
+                }
+            </div>
+
+            <button class="layer" [class.on]="coverageOn" (click)="toggleCoverage()" [attr.aria-pressed]="coverageOn">
+                <span class="swatch" [style.--c]="'#c81e1e'"></span>
+                <span class="l-name">{{ tr('Fire station reach') }}</span>
+                <span class="switch"><i></i></span>
+            </button>
+
+            @if (coverageOn) {
+            <label class="sliders single">
+                <span>{{ tr('Response radius') }} <b>{{ coverageKm }} km</b></span>
+                <input type="range" min="2" max="30" step="1" [value]="coverageKm" (input)="onCoverageKm($event)" />
+            </label>
+
+            <div class="presets">
+                <button [class.active]="placing" (click)="togglePlacing()">
+                    {{ placing ? tr('Click the map to place…') : tr('+ Add proposed station') }}
+                </button>
+                @if (hypo.length) { <button (click)="clearHypo()">{{ tr('Clear ({n})', { n: hypo.length }) }}</button> }
+            </div>
+            @if (hypo.length && coverage.known) {
+            <div class="gap-card ok"
+                [innerHTML]="trHtml('Proposed stations cover {n} more high-risk zones ({was} → {now} uncovered).', { n: coverage.baseGaps - coverage.gaps, was: coverage.baseGaps, now: coverage.gaps }, ['n'])">
+            </div>
+            }
+
+            @if (coverage.known) {
+            <div class="gap-card" [class.ok]="coverage.gaps === 0"
+                [innerHTML]="trHtml('{gaps} of {high} high or very high risk zones are farther than {km} km from a fire station.', { gaps: coverage.gaps, high: coverage.high, km: coverageKm }, ['gaps'])">
+            </div>
+            <p class="hint">{{ tr('Dashed outlines on the map mark those zones. Distances are straight-line, not by
+                road.') }}</p>
+            } @else {
+            <p class="hint">{{ tr('Waiting for station data. If this stays, restart the API so it adds distances to the
+                zones.') }}</p>
+            }
+            }
+        </section>
+
+        <!-- ===================== Settlement exposure ===================== -->
+        <section class="block">
+            <div class="block-head">
+                <h2>{{ tr('Settlement exposure') }}</h2>
+                @if (exposure.length) { <span class="status">{{ tr('{n} exposed', { n: exposure.length }) }}</span> }
+            </div>
+            <p class="hint">{{ tr('High or very high risk forest within 1 km of each settlement centre. Covered means a
+                fire station within {km} km in a straight line, including proposed stations.', { km: coverageKm }) }}
+            </p>
+            <div class="presets">
+                <button [class.active]="onlyUncovered" (click)="toggleUncovered()">{{ tr('Uncovered only') }}</button>
+                <button (click)="exportCSV()">{{ tr('Export CSV') }}</button>
+                <button (click)="exportExposure()">{{ tr('Export Excel') }}</button>
+            </div>
+            <ul class="expo">
+                @for (r of exposureShown; track r.id) {
+                <li>
+                    <button (click)="flyToSettlement(r)">
+                        <span class="e-name">{{ r.name }}</span>
+                        <span class="e-bar"><i [style.width.%]="r.share * 100"></i></span>
+                        <span class="e-ha">{{ r.ha.toFixed(0) }} ha</span>
+                        <span class="e-chip" [class.ok]="r.covered">
+                            {{ r.covered ? tr('covered') : r.stationKm.toFixed(0) + ' km' }}
+                        </span>
+                    </button>
+                </li>
+                }
+            </ul>
+            @if (exposure.length > 20) {
+            <button class="more" (click)="toggleShowAll()">{{ showAllExposure ? tr('Show top 20') : tr('Show all')
+                }}</button>
+            }
+        </section>
+
+        <!-- ======================= Burned areas ===================== -->
+        @if (layerOn('burned')) {
+        <section class="block">
+            <div class="block-head">
+                <h2>{{ tr('Burned areas') }}</h2>
+                <span class="status">{{ tr('{shown} of {total} fires', { shown: burnedCount.shown, total:
+                    burnedCount.total }) }}</span>
+            </div>
+            <div class="sliders">
+                <label>
+                    <span>{{ tr('From') }} <b>{{ burnedFrom }}</b></span>
+                    <input type="range" [min]="burnedMin" [max]="burnedMax" step="1" [value]="burnedFrom"
+                        (input)="onBurnedYear('from', $event)" />
+                </label>
+                <label>
+                    <span>{{ tr('To') }} <b>{{ burnedTo }}</b></span>
+                    <input type="range" [min]="burnedMin" [max]="burnedMax" step="1" [value]="burnedTo"
+                        (input)="onBurnedYear('to', $event)" />
+                </label>
+            </div>
+            <div class="presets">
+                <button (click)="setBurnedPeriod('all')">{{ tr('All years') }}</button>
+                <button (click)="setBurnedPeriod('validation')">{{ tr('After {y} only', { y: trainEnd }) }}</button>
+            </div>
+            <div class="key-row" [style.--c]="'#64748b'"><i></i>{{ tr('Up to {y} (used to build fire history)', { y:
+                trainEnd }) }}</div>
+            <div class="key-row" [style.--c]="'#6d28d9'"><i></i>{{ tr('After {y} (used to test the model)', { y:
+                trainEnd }) }}</div>
+        </section>
+        }
+
+        <!-- ===================== Layers ===================== -->
+        <section class="block">
+            <div class="block-head">
+                <h2>{{ tr('Layers') }}</h2>
+            </div>
+            @for (g of layerGroups; track g) {
+            <div class="group">
+                <h3>{{ tr(g) }}</h3>
+                @for (l of layersIn(g); track l.key) {
+                <button class="layer" [class.on]="l.visible" (click)="toggleLayer(l.key)"
+                    [attr.aria-pressed]="l.visible">
+                    <span class="swatch" [class.line]="l.shape === 'line'" [class.dot]="l.shape === 'dot'"
+                        [style.--c]="l.swatch"></span>
+                    <span class="l-name">{{ tr(l.label) }}</span>
+                    @if (l.loading) {
+                    <span class="mini-spinner"></span>
+                    } @else {
+                    <span class="switch"><i></i></span>
+                    }
+                </button>
+                }
+            </div>
+            }
+        </section>
+
+        <!-- ===================== Map style ===================== -->
+        <section class="block">
+            <div class="block-head">
+                <h2>{{ tr('Map style') }}</h2>
+            </div>
+            <div class="chips">
+                @for (b of basemaps; track b.id) {
+                <button [class.active]="basemap === b.id" (click)="setBasemap(b.id)">{{ tr(b.label) }}</button>
+                }
+            </div>
+            <label class="sliders single">
+                <span>{{ tr('Risk layer opacity') }} <b>{{ (forestOpacity * 100).toFixed(0) }}%</b></span>
+                <input type="range" min="0.1" max="1" step="0.05" [value]="forestOpacity"
+                    (input)="setOpacity($event)" />
+            </label>
+        </section>
+
+        <p class="foot">{{ tr('Zone colours show a static susceptibility score. Classes are percentile bands across all
+            zones, so they show relative ranking, not an absolute danger level. Fire Weather Index calculated from
+            weather data by Open-Meteo.com. Land cover: Contains Copernicus Land Monitoring Service information, ©
+            European Union, EEA, CORINE Land Cover 2012.') }}</p>
+    </aside>
+
+    <main class="map-wrapper">
+        <div class="toolbar">
+            <button (click)="toggleSidebar()" [title]="sidebarOpen ? tr('Hide panel') : tr('Show panel')"
+                [attr.aria-label]="sidebarOpen ? tr('Hide panel') : tr('Show panel')">
+                {{ sidebarOpen ? '◀' : '▶' }}
+            </button>
+            <button (click)="resetView()" [title]="tr('Fit Crete')"
+                [attr.aria-label]="tr('Fit Crete in view')">⌖</button>
+        </div>
+
+        @if (loadingForests) {
+        <div class="loader-overlay">
+            <div class="spinner"></div>
+            <p>{{ tr('Loading forest zones for Crete') }}</p>
+        </div>
+        }
+        <div id="map"></div>
+    </main>
+</div>

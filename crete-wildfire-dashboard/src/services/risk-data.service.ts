@@ -1,0 +1,76 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class RiskDataService {
+  private apiUrl = 'http://127.0.0.1:8000/api';
+
+  constructor(private http: HttpClient) {}
+
+  getRiskZones(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/risk-zones`);
+  }
+
+  getLiveWeather(refresh = false): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/weather`, {
+      params: refresh ? { refresh: 'true' } : {},
+    });
+  }
+
+  getPowerLines(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/power-lines`);
+  }
+
+  getPowerNodes(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/power-nodes`);
+  }
+
+  getPowerStations(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/power-stations`);
+  }
+
+  getSettlements(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/settlements`);
+  }
+
+  getRivers(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/rivers`);
+  }
+
+  getLakes(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/lakes`);
+  }
+
+  getRoads(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/roads`);
+  }
+
+  getFireStations(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/fire-stations`);
+  }
+
+  getWaterPoints(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/water-points`);
+  }
+
+  getHelipads(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/helipads`);
+  }
+
+  getBurnedAreas(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/burned-areas`);
+  }
+
+  getModel(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/model`);
+  }
+
+  getFwi(refresh = false): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/fwi`, {
+      params: refresh ? { refresh: 'true' } : {},
+    });
+  }
+}
