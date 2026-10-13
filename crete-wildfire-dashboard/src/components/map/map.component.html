@@ -143,17 +143,19 @@
 
             @if (byRoad) {
             <label class="sliders single">
-                <span>{{ tr('Drive time') }} <b>{{ driveMin }} min</b></span>
+                <span>{{ tr('Drive time') }} <b>{{ tr('{n} min', { n: driveMin }) }} min</b></span>
                 <input type="range" min="5" [max]="roadMax" step="1" [value]="driveMin" (input)="onDriveMin($event)" />
             </label>
             <div class="reach-legend">
                 @for (b of reachBands; track b) {
-                <span><i [style.background]="bandColor(b)"></i>≤ {{ b }} min</span>
+                <span><i [style.background]="bandColor(b)"></i>≤ {{ tr('{n} min', { n: b }) }}</span>
                 }
+                <p class="hint">{{ tr('Coloured roads show how far a fire engine gets from the nearest station, in
+                    5-minute bands.') }}</p>
             </div>
             } @else {
             <label class="sliders single">
-                <span>{{ tr('Response radius') }} <b>{{ coverageKm }} km</b></span>
+                <span>{{ tr('Response radius') }} <b>{{ tr('{n} km', { n: coverageKm }) }} km</b></span>
                 <input type="range" min="2" max="30" step="1" [value]="coverageKm" (input)="onCoverageKm($event)" />
             </label>
             }
@@ -212,7 +214,7 @@
                     <button (click)="flyToSettlement(r)">
                         <span class="e-name">{{ r.name || tr('Settlement') }}</span>
                         <span class="e-bar"><i [style.width.%]="r.share * 100"></i></span>
-                        <span class="e-ha">{{ r.ha.toFixed(0) }} ha</span>
+                        <span class="e-ha">{{ r.ha.toFixed(0) }} '{{ tr('{n} ha', { n: r.ha.toFixed(0) }) }}'</span>
                         <span class="e-chip" [class.ok]="r.covered">
                             {{ r.covered ? tr('covered')
                             : r.byRoad

@@ -242,6 +242,11 @@
                 πάνω του για να τον διαγράψετε. Το πάνελ εμφανίζει πόσες ζώνες υψηλού κινδύνου καλύπτουν οι νέοι
                 σταθμοί.
                 Οι προτεινόμενοι σταθμοί δεν αποθηκεύονται.</p>
+            <p><b>Στον χάρτη.</b> Στην οδική λειτουργία, οι χρωματισμένοι δρόμοι δείχνουν πού μπορεί να φτάσει ένα
+                πυροσβεστικό όχημα από τον πλησιέστερο σταθμό (υφιστάμενο ή προτεινόμενο) εντός του επιλεγμένου χρόνου,
+                ανά διαστήματα 5 λεπτών. Οι ζώνες υψηλού κινδύνου που δεν προσεγγίζονται έχουν διακεκομμένο περίγραμμα.
+                Οι δρόμοι σχεδιάζονται έως την τελευταία διασταύρωση που προσεγγίζεται, οπότε το όριο του χρωματισμένου
+                δικτύου είναι προσεγγιστικό.</p>
             <div class="callout warn">
                 <strong>Εκτιμήσεις και όχι μετρήσεις.</strong> Οι ταχύτητες είναι παραδοχές. Οι χρόνοι οδήγησης δεν
                 περιλαμβάνουν την παραλαβή της κλήσης, την ετοιμασία του πληρώματος, την κυκλοφορία, τα κλειστά ή
@@ -255,9 +260,10 @@
             <p>
                 Για κάθε οικισμό, το εργαλείο αναλύει κύκλο ακτίνας 1 km γύρω από το κέντρο του και μετράει ποιο ποσοστό
                 αυτού αποτελείται από δάσος υψηλού ή πολύ υψηλού κινδύνου. Οι οικισμοί κατατάσσονται βάσει αυτού του
-                ποσοστού,
-                και καθένας λαμβάνει κατάσταση κάλυψης (καλυμμένος/μη καλυμμένος) βάσει της απόστασης ευθείας γραμμής
-                από τον πλησιέστερο σταθμό (συμπεριλαμβανομένων των προτεινόμενων).
+                ποσοστού. Κάθε οικισμός λαμβάνει κατάσταση κάλυψης: στην
+                οδική λειτουργία βάσει του χρόνου οδήγησης από τον πλησιέστερο σταθμό (υφιστάμενο ή προτεινόμενο),
+                συμπεριλαμβανομένου ενός αργού τμήματος από το κέντρο του οικισμού έως τον πλησιέστερο δρόμο· στη
+                λειτουργία ευθείας γραμμής βάσει της απόστασης.
             </p>
             <ul>
                 <li>Τα εκτάρια είναι κατά προσέγγιση (δειγματοληψία σε πλέγμα 125 m), οπότε χρησιμοποιήστε τα για
@@ -302,8 +308,7 @@
                     </tr>
                     <tr>
                         <td>Δίκτυα ηλεκτρικής ενέργειας (γραμμές μεταφοράς), οδοποιία, οικισμοί, πυροσβεστικοί σταθμοί,
-                            υδροληψίες, ελικοδρόμια
-                        </td>
+                            υδροληψίες, ελικοδρόμια</td>
                         <td>© Συνεισφέροντες OpenStreetMap, ODbL / Περιφέρεια Κρήτης (data.gov.gr)</td>
                         <td>Τρέχον στιγμιότυπο (εξαγωγή μέσω Overpass Turbo / Περιφερειακής πύλης GIS)</td>
                     </tr>
@@ -340,6 +345,10 @@
                 <li><b>Ασθενής επικύρωση καιρού.</b> Ο δείκτης FWI διαχώριζε ασθενώς τις ημέρες πυρκαγιάς από τις
                     υπόλοιπες καλοκαιρινές ημέρες.</li>
                 <li><b>Μόνο για την Κρήτη.</b> Το μοντέλο δεν έχει δοκιμαστεί σε άλλες περιοχές.</li>
+                <li><b>Τα δεδομένα σταθμών μπορεί να είναι ελλιπή.</b> Η κάλυψη λαμβάνει υπόψη μόνο τους σταθμούς του
+                    συνόλου δεδομένων. Εθελοντικές ομάδες, μονάδες της Δασικής Υπηρεσίας ή άλλοι πόροι μπορεί να
+                    λείπουν,
+                    οπότε ο αριθμός των μη καλυμμένων ζωνών μπορεί να είναι υπερεκτιμημένος.</li>
             </ul>
         </section>
 
@@ -385,9 +394,9 @@
 
             <details>
                 <summary>Τι σημαίνει ακριβώς ότι μια περιοχή είναι «καλυμμένη»;</summary>
-                <p>Για τις ζώνες, σημαίνει ότι οποιοδήποτε τμήμα τους βρίσκεται εντός της ακτίνας του σταθμού.
-                    Για τους οικισμούς, ότι το κέντρο του οικισμού βρίσκεται εντός της ακτίνας. Και οι δύο περιπτώσεις
-                    χρησιμοποιούν απόσταση ευθείας γραμμής.</p>
+                <p>Για τις ζώνες, στην οδική λειτουργία σημαίνει ότι ένας σταθμός μπορεί να φτάσει τη ζώνη εντός του
+                    χρονικού ορίου· στη λειτουργία ευθείας γραμμής, ότι οποιοδήποτε τμήμα της βρίσκεται εντός της
+                    ακτίνας. Για τους οικισμούς, το ίδιο όριο εφαρμόζεται στο κέντρο του οικισμού.</p>
             </details>
 
             <details>
@@ -640,6 +649,10 @@
             <p><b>Proposed stations.</b> Turn on "Fire station reach", press "Add proposed station" and click the map.
                 Drag a marker to move it, click it to remove it. The panel shows how many high-risk zones the new
                 stations cover. Proposed stations are not saved.</p>
+            <p><b>On the map.</b> In road mode, coloured roads show where a fire engine can get to from the nearest
+                station (existing or proposed) within the chosen time, in 5-minute bands. High-risk zones that are
+                not reached have a dashed outline. Roads are drawn up to the last junction reached, so the edge of the
+                coloured network is approximate.</p>
             <div class="callout warn">
                 <strong>Estimates, not measurements.</strong> Speeds are assumptions. Drive times exclude call handling,
                 crew turnout, traffic, road closures and fire-damaged roads, and dirt tracks are not used. Treat them as
@@ -651,9 +664,10 @@
             <h2>Settlement exposure</h2>
             <p>
                 For each settlement, the tool samples the 1 km circle around its centre and measures how
-                much of it is High or Very high risk forest. Settlements are ranked by that share, and each
-                gets a covered or uncovered status based on the straight-line distance to the nearest
-                station, including proposed ones.
+                much of it is High or Very high risk forest. Settlements are ranked by that share. Each gets a covered
+                or uncovered status: in road mode from the
+                drive time to the nearest station (existing or proposed), including a slow leg from the settlement
+                centre to the nearest road; in straight-line mode from the distance.
             </p>
             <ul>
                 <li>Hectares are approximate (sampled on a 125 m grid), so use them for ranking, not measurement.</li>
@@ -698,6 +712,7 @@
                         <td>© OpenStreetMap contributors, ODbL / Region of Crete (data.gov.gr)</td>
                         <td>Current snapshot (extracted via Overpass Turbo / Regional GIS portal)</td>
                     </tr>
+
                     <tr>
                         <td>Base maps</td>
                         <td>OpenTopoMap (terrain), Esri World Imagery (satellite)</td>
@@ -727,6 +742,10 @@
                 <li><b>Weak fire-weather validation.</b> The Fire Weather Index only weakly separated fire days from
                     other summer days (see above).</li>
                 <li><b>Crete only.</b> The model was not tested elsewhere.</li>
+                <li><b>Station data may be incomplete.</b> Coverage counts only the stations in the dataset. Volunteer
+                    brigades, forest service units or other resources may be missing, so uncovered numbers can be
+                    overstated.</li>
+
             </ul>
         </section>
 
@@ -769,7 +788,8 @@
             <details>
                 <summary>What does "covered" mean exactly?</summary>
                 <p>For zones, it means a station can reach the zone within the time limit (or, in straight-line mode,
-                    any part of the zone is within the radius).</p>
+                    any part of the zone is within the radius). For settlements, the same limit is applied to the
+                    settlement centre.</p>
             </details>
 
             <details>

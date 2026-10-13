@@ -56,6 +56,8 @@ const EL: Record<string, string> = {
   '>{n} min': '>{n} λεπτά',
   '{n} min': '{n} λεπτά',
   '{n} km': '{n} χλμ',
+  'Coloured roads show how far a fire engine gets from the nearest station, in 5-minute bands.':
+    'Οι χρωματισμένοι δρόμοι δείχνουν πόσο μακριά φτάνει ένα πυροσβεστικό όχημα από τον πλησιέστερο σταθμό, ανά 5 λεπτά.',
 
   // weather station names
   Chania: 'Χανιά',
@@ -330,17 +332,18 @@ const warned = new Set<string>();
  * Unknown text is returned unchanged; in dev mode it is also logged once (console level "Verbose").
  */
 export function translate(lang: string, text: string, params?: Params): string {
-  let out = text;
+  const key = text.replace(/\s+/g, ' ').trim();
+  let out = key;
   if (lang === 'el') {
-    out = EL[text] ?? fromRules(text) ?? text;
+    out = EL[key] ?? fromRules(key) ?? key;
     if (
-      out === text &&
+      out === key &&
       isDevMode() &&
-      /[A-Za-z]{3,}/.test(text) &&
-      !warned.has(text)
+      /[A-Za-z]{3,}/.test(key) &&
+      !warned.has(key)
     ) {
-      warned.add(text);
-      console.debug('[i18n] no Greek text for:', text);
+      warned.add(key);
+      console.debug('[i18n] no Greek text for:', key);
     }
   }
   return params
