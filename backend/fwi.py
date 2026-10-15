@@ -12,6 +12,7 @@ from datetime import date, timedelta
 
 import pandas as pd
 import requests
+import time
 
 ARCHIVE = "https://archive-api.open-meteo.com/v1/archive"
 FORECAST = "https://api.open-meteo.com/v1/forecast"
@@ -98,11 +99,20 @@ def calc_fwi(isi, bui):
 # Weather -> daily noon table
 # --------------------------------------------------------------------------- #
 def _get(url: str, stations: list[dict], **extra) -> list[dict]:
-    r = requests.get(url, params={
+    params = {
         "latitude": ",".join(str(s["lat"]) for s in stations),
         "longitude": ",".join(str(s["lon"]) for s in stations),
         "hourly": HOURLY, "wind_speed_unit": "kmh", "timezone": TZ, **extra,
-    }, timeout=90)
+    }
+    for i in range(5):
+        r = requests.get(url, params=params, timeout=90)
+        if r.status_code != 429:
+            break
+        try:
+            wait = int(r.headers.get("Retry-After", ""))
+        except ValueError:
+            wait = 15 * 2 ** i
+        time.sleep(min(wait, 120))
     r.raise_for_status()
     res = r.json()
     return res if isinstance(res, list) else [res]

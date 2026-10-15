@@ -55,6 +55,39 @@ WEATHER_TTL, WEATHER_MIN_REFRESH = 600, 60
 FWI_TTL, FWI_MIN_REFRESH = 3 * 3600, 300
 RETRY_AFTER_FAILURE = 60
 
+DATA_URL = os.environ.get("DATA_URL", "").rstrip("/")
+DATA_MAX_AGE_H = 9          # the job runs every 3 h; older than this means it has been failing
+_remote: dict = {}
+
+def _age_hours(data: dict) -> float:
+    ts = data.get("computed") or data.get("updated")
+    try:
+        t = datetime.fromisoformat(ts).replace(tzinfo=ATHENS)
+        return (datetime.now(ATHENS) - t).total_seconds() / 3600
+    except Exception:
+        return 0.0
+
+
+def remote_json(name: str, ttl: int = 300) -> dict:
+    """Reads weather.json / fwi.json published by the GitHub Actions job."""
+    now = time.time()
+    hit = _remote.get(name)
+    if hit and now - hit[0] < ttl:
+        return hit[1]
+    try:
+        r = requests.get(f"{DATA_URL}/{name}.json", timeout=8)
+        r.raise_for_status()
+        data = r.json()
+        if _age_hours(data) > DATA_MAX_AGE_H:
+            data["stale"] = True
+        _remote[name] = (now, data)
+        return data
+    except Exception as exc:
+        log.warning("Could not read %s: %s", name, exc)
+        if hit:
+            return {**hit[1], "stale": True}
+        raise
+
 app = FastAPI(
     title="Crete Wildfire Risk Platform API",
     description="Static susceptibility zones, infrastructure layers, live weather and Fire Weather Index.",
@@ -125,8 +158,9 @@ def fetch_weather(force: bool = False) -> dict:
 
 @app.get("/api/weather")
 def weather_endpoint(refresh: bool = False):
-    """Current conditions at the stations. ?refresh=true skips the cache (rate limited)."""
     try:
+        if DATA_URL:
+            return remote_json("weather")
         return fetch_weather(force=refresh)
     except Exception:
         raise HTTPException(status_code=503, detail="Weather service unavailable")
@@ -139,6 +173,11 @@ EMPTY_FWI = {"live": False, "stale": False, "in_season": True, "stations": []}
 
 @app.get("/api/fwi")
 def fwi_endpoint(refresh: bool = False):
+    if DATA_URL:
+        try:
+            return remote_json("fwi", 600)
+        except Exception:
+            return EMPTY_FWI
     """Fire Weather Index per station, computed from Open-Meteo noon weather."""
     def fresh_enough() -> bool:
         age = time.time() - _fwi_cache["t"]

@@ -1,0 +1,43 @@
+name: Update weather data
+
+on:
+  schedule:
+    - cron: "17 */3 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-weather
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install requests pandas numpy tzdata
+
+      - name: Keep the previous files as a fallback
+        run: |
+          mkdir -p /tmp/out
+          BASE=https://raw.githubusercontent.com/${{ github.repository }}/data
+          curl -fsS "$BASE/weather.json" -o /tmp/out/weather.json || true
+          curl -fsS "$BASE/fwi.json" -o /tmp/out/fwi.json || true
+
+      - name: Fetch new data
+        run: python backend/export_weather.py /tmp/out
+
+      - name: Publish to the data branch
+        run: |
+          git config user.name "weather-bot"
+          git config user.email "weather-bot@users.noreply.github.com"
+          git checkout --orphan data-new
+          git rm -rf . >/dev/null 2>&1 || true
+          cp /tmp/out/weather.json /tmp/out/fwi.json . 2>/dev/null || cp /tmp/out/*.json .
+          git add *.json
+          git commit -m "Update weather $(date -u +%FT%TZ)"
+          git push --force origin data-new:data
