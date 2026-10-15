@@ -1,0 +1,9 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+geopandas>=0.14
+pandas>=2.0
+numpy>=1.26
+scipy>=1.11
+pyogrio>=0.7
+requests>=2.31
+tzdata

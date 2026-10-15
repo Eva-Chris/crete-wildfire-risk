@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: crete-wildfire-api
+    env: docker
+    region: frankfurt
+    plan: free
+    buildCommand: ""
+    startCommand: ""
+    envVars:
+      - key: CORS_ORIGINS
+        value: https://Eva-Chris.github.io

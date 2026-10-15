@@ -1,0 +1,11 @@
+.venv
+__pycache__
+*.pbf
+*.tif
+*.tiff
+*.pkl
+*.gpkg
+data/DEM*
+data/clc2012*
+data/noon_*
+tests

@@ -903,6 +903,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         def.loading = false;
         if (key === 'forests') this.loadingForests = false;
         if (def.visible) this.outside(() => layer.addTo(this.map));
+        if (def.visible && (key === 'forests' || key === 'settlements')) {
+          this.outside(() =>
+            (this.lyr.settlements as L.GeoJSON | undefined)?.bringToFront(),
+          );
+        }
         if (key === 'forests' || key === 'settlements')
           this.buildExposureIndex();
         if (key === 'forests' || key === 'fireStations') this.applyCoverage();
@@ -968,10 +973,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   private buildLayer(key: LayerKey, data: FeatColl): L.Layer {
     const dot =
-      (color: string, radius: number, pane: string) =>
+      (color: string, radius: number, _pane: string) =>
       (_f: unknown, ll: L.LatLng) =>
         L.circleMarker(ll, {
-          pane,
+          pane: 'forestsPane',
+          renderer: this.canvas('forestsPane'),
           radius,
           fillColor: color,
           fillOpacity: 0.95,
@@ -1050,14 +1056,15 @@ export class MapComponent implements AfterViewInit, OnDestroy {
           };
         });
         return L.geoJSON(data, {
-          pane: 'settlePane',
+          pane: 'forestsPane',
           style: {
+            renderer: this.canvas('forestsPane'),
             fillColor: '#e7298a',
             color: '#a1155f',
             weight: 1,
             fillOpacity: 0.55,
           },
-          pointToLayer: dot('#e7298a', 4.5, 'settlePane'),
+          pointToLayer: dot('#e7298a', 4.5, 'forestsPane'),
           onEachFeature: (f, l) =>
             l.bindPopup(
               () => this.propsPopup(this.tr('Settlement'), f.properties),
