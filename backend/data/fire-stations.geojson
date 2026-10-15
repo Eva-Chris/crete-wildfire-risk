@@ -1,0 +1,403 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2026-10-09T08:07:36Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/618676255",
+        "addr:city": "Πέραμα",
+        "addr:housenumber": "76",
+        "addr:postcode": "74052",
+        "addr:street": "Αρκαδίου",
+        "amenity": "fire_station",
+        "building": "yes",
+        "name": "Πυροσβεστικό Κλιμάκιο Περάματος",
+        "opening_hours": "24/7",
+        "phone": "+30 28340 23199",
+        "phone_1": "2834020009"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              24.7020058,
+              35.3688913
+            ],
+            [
+              24.7019448,
+              35.3687903
+            ],
+            [
+              24.7020392,
+              35.3687525
+            ],
+            [
+              24.7021002,
+              35.3688535
+            ],
+            [
+              24.7020058,
+              35.3688913
+            ]
+          ]
+        ]
+      },
+      "id": "way/618676255"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/694526459",
+        "amenity": "fire_station",
+        "building": "yes",
+        "name": "Πυροσβεστική υπηρεσία Αγίου Νικολάου"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              25.707737,
+              35.2063815
+            ],
+            [
+              25.7077441,
+              35.2062799
+            ],
+            [
+              25.7080095,
+              35.2062922
+            ],
+            [
+              25.7080024,
+              35.2063939
+            ],
+            [
+              25.707737,
+              35.2063815
+            ]
+          ]
+        ]
+      },
+      "id": "way/694526459"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/696951582",
+        "addr:city": "Ηράκλειο",
+        "addr:housenumber": "5",
+        "addr:postcode": "71306",
+        "addr:street": "Πλατεία Κύπρου",
+        "amenity": "fire_station",
+        "building": "yes",
+        "name": "ΠΕΡΙΦΕΡΕΙΑΚΗ ΠΥΡΟΣΒΕΣΤΙΚΗ ΔΙΟΙΚΗΣΗ ΚΡΗΤΗΣ",
+        "name:el": "ΠΕΡΙΦΕΡΕΙΑΚΗ ΠΥΡΟΣΒΕΣΤΙΚΗ ΔΙΟΙΚΗΣΗ ΚΡΗΤΗΣ",
+        "name:en": "Regional Fire Administration of Crete",
+        "phone": "+30 2813407000"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              25.135304,
+              35.3332934
+            ],
+            [
+              25.1351873,
+              35.3331685
+            ],
+            [
+              25.135295,
+              35.3331044
+            ],
+            [
+              25.1353291,
+              35.333028
+            ],
+            [
+              25.13535,
+              35.3330325
+            ],
+            [
+              25.1354108,
+              35.3330455
+            ],
+            [
+              25.1354927,
+              35.333063
+            ],
+            [
+              25.1354836,
+              35.3331198
+            ],
+            [
+              25.1354336,
+              35.3332063
+            ],
+            [
+              25.1353929,
+              35.333234
+            ],
+            [
+              25.135375,
+              35.3332494
+            ],
+            [
+              25.135304,
+              35.3332934
+            ]
+          ]
+        ]
+      },
+      "id": "way/696951582"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/784292450",
+        "amenity": "fire_station",
+        "building": "fire_station",
+        "fire_station:type": "airport"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              24.1560867,
+              35.5350864
+            ],
+            [
+              24.1560539,
+              35.5349414
+            ],
+            [
+              24.156722,
+              35.5348411
+            ],
+            [
+              24.1567971,
+              35.5351724
+            ],
+            [
+              24.1566445,
+              35.5351953
+            ],
+            [
+              24.1566356,
+              35.5351559
+            ],
+            [
+              24.1563656,
+              35.5351965
+            ],
+            [
+              24.1563322,
+              35.5350495
+            ],
+            [
+              24.1560867,
+              35.5350864
+            ]
+          ]
+        ]
+      },
+      "id": "way/784292450"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1281223968",
+        "addr:city": "Αλικιανός",
+        "addr:postcode": "73005",
+        "amenity": "fire_station",
+        "building": "fire_station",
+        "name": "Εποχικό Πυροσβεστικό Κλιμάκιο Αλικιανού"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              23.9105262,
+              35.4543719
+            ],
+            [
+              23.9105081,
+              35.4542887
+            ],
+            [
+              23.9105879,
+              35.4542772
+            ],
+            [
+              23.9106059,
+              35.4543604
+            ],
+            [
+              23.9105262,
+              35.4543719
+            ]
+          ]
+        ]
+      },
+      "id": "way/1281223968"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1523030936",
+        "amenity": "fire_station",
+        "building": "yes",
+        "name": "New Heraklion Airport Fire Station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              25.3076366,
+              35.1708664
+            ],
+            [
+              25.3074726,
+              35.1704762
+            ],
+            [
+              25.307792,
+              35.1703865
+            ],
+            [
+              25.3079559,
+              35.1707767
+            ],
+            [
+              25.3076366,
+              35.1708664
+            ]
+          ]
+        ]
+      },
+      "id": "way/1523030936"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/552395041",
+        "amenity": "fire_station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.3900765,
+          35.315737
+        ]
+      },
+      "id": "node/552395041"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1764287080",
+        "amenity": "fire_station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.7515883,
+          35.0257553
+        ]
+      },
+      "id": "node/1764287080"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3749281890",
+        "amenity": "fire_station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.4817834,
+          35.2022128
+        ]
+      },
+      "id": "node/3749281890"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5192367121",
+        "addr:housenumber": "14",
+        "addr:postcode": "73135",
+        "addr:street": "Γρηγορίου Ε",
+        "amenity": "fire_station",
+        "name": "Πυροσβεστική Χανίων",
+        "name:el": "Πυροσβεστική Χανίων",
+        "name:en": "Fire Deoartment Chania",
+        "phone": "+30 2821 092410"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0198435,
+          35.511215
+        ]
+      },
+      "id": "node/5192367121"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8062847897",
+        "amenity": "fire_station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0825529,
+          35.2189188
+        ]
+      },
+      "id": "node/8062847897"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12708550201",
+        "amenity": "fire_station",
+        "name": "πυροσβεστική Μοίρες"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.8667696,
+          35.0215561
+        ]
+      },
+      "id": "node/12708550201"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13257326004",
+        "amenity": "fire_station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.181222,
+          35.3360393
+        ]
+      },
+      "id": "node/13257326004"
+    }
+  ]
+}

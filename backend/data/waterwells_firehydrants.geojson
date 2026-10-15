@@ -1,0 +1,1844 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2026-10-09T08:13:29Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/264400297",
+        "man_made": "water_well",
+        "note": "roundabout is also a water well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.38895,
+          35.3072644
+        ]
+      },
+      "id": "node/264400297"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/919587052",
+        "amenity": "drinking_water",
+        "man_made": "water_well",
+        "pump": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.7790307,
+          34.9294632
+        ]
+      },
+      "id": "node/919587052"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4093474501",
+        "colour": "blue",
+        "emergency": "fire_hydrant"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.988259,
+          35.056504
+        ]
+      },
+      "id": "node/4093474501"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4166332394",
+        "drinking_water": "no",
+        "ele": "685",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0137766,
+          35.2268441
+        ]
+      },
+      "id": "node/4166332394"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4167976404",
+        "intermittent": "dry",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          26.2824692,
+          35.1830671
+        ]
+      },
+      "id": "node/4167976404"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4191732723",
+        "ele": "1096",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.1632118,
+          35.2741367
+        ]
+      },
+      "id": "node/4191732723"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4222647178",
+        "drinking_water": "yes",
+        "drinking_water:legal": "yes",
+        "ele": "441",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9531267,
+          34.9610808
+        ]
+      },
+      "id": "node/4222647178"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4363729813",
+        "emergency": "fire_hydrant"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1329691,
+          35.3362198
+        ]
+      },
+      "id": "node/4363729813"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4363729862",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1358283,
+          35.3385648
+        ]
+      },
+      "id": "node/4363729862"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4363729915",
+        "emergency": "fire_hydrant",
+        "survey:date": "2023-07-23"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1342111,
+          35.3414711
+        ]
+      },
+      "id": "node/4363729915"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4501001585",
+        "historic": "yes",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.960131,
+          35.3599142
+        ]
+      },
+      "id": "node/4501001585"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4653627392",
+        "ele": "502",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.8415962,
+          35.3075674
+        ]
+      },
+      "id": "node/4653627392"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4821944786",
+        "drinking_water": "no",
+        "ele": "1232",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.1586683,
+          35.2799542
+        ]
+      },
+      "id": "node/4821944786"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4842690287",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.7373211,
+          35.3785354
+        ]
+      },
+      "id": "node/4842690287"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4864061485",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          23.9845725,
+          35.2376961
+        ]
+      },
+      "id": "node/4864061485"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5083594477",
+        "ele": "695",
+        "man_made": "water_well",
+        "pump": "powered"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.1969143,
+          35.2817251
+        ]
+      },
+      "id": "node/5083594477"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5083594479",
+        "ele": "696",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.1981253,
+          35.2825046
+        ]
+      },
+      "id": "node/5083594479"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5083594481",
+        "ele": "677",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.1945204,
+          35.2875808
+        ]
+      },
+      "id": "node/5083594481"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5083651130",
+        "ele": "973",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.2025402,
+          35.261547
+        ]
+      },
+      "id": "node/5083651130"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5362190948",
+        "ele": "788",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          23.9259975,
+          35.3691732
+        ]
+      },
+      "id": "node/5362190948"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5774732357",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0308185,
+          35.5104832
+        ]
+      },
+      "id": "node/5774732357"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5777504054",
+        "emergency": "fire_hydrant"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0300168,
+          35.5135063
+        ]
+      },
+      "id": "node/5777504054"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5935066242",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0731191,
+          34.8706405
+        ]
+      },
+      "id": "node/5935066242"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6535272108",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "water_source": "main"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          26.1030694,
+          35.2087404
+        ]
+      },
+      "id": "node/6535272108"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6788367089",
+        "colour": "red",
+        "couplings": "2",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.3901519,
+          35.3175898
+        ]
+      },
+      "id": "node/6788367089"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6788427587",
+        "colour": "red",
+        "couplings": "2",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.3896146,
+          35.3153224
+        ]
+      },
+      "id": "node/6788427587"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6799452193",
+        "emergency": "fire_hydrant"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          23.7356479,
+          35.5422938
+        ]
+      },
+      "id": "node/6799452193"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7001965856",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.5543227,
+          35.3577903
+        ]
+      },
+      "id": "node/7001965856"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7007955834",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.6784097,
+          35.3236211
+        ]
+      },
+      "id": "node/7007955834"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7008753046",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.4871052,
+          35.3665047
+        ]
+      },
+      "id": "node/7008753046"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7782120553",
+        "access": "yes",
+        "drinking_water": "no",
+        "man_made": "water_well",
+        "pump": "yes",
+        "ref": "Well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.7269661,
+          35.3010177
+        ]
+      },
+      "id": "node/7782120553"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8191174916",
+        "ele": "569",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0620193,
+          35.2243463
+        ]
+      },
+      "id": "node/8191174916"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8191214917",
+        "ele": "571",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0625718,
+          35.2250519
+        ]
+      },
+      "id": "node/8191214917"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8191214921",
+        "ele": "573",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0625718,
+          35.226235
+        ]
+      },
+      "id": "node/8191214921"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8191214922",
+        "ele": "575",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0625557,
+          35.2258516
+        ]
+      },
+      "id": "node/8191214922"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8339913448",
+        "access": "yes",
+        "man_made": "water_well",
+        "pump": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.6940432,
+          34.8790231
+        ]
+      },
+      "id": "node/8339913448"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9116139645",
+        "description": "Puits contenant de l'eau mi-septembre 2021. Origine ?",
+        "ele": "2438",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.7709949,
+          35.2263787
+        ]
+      },
+      "id": "node/9116139645"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9922362224",
+        "drinking_water": "yes",
+        "man_made": "water_well",
+        "name": "Λαυρακάς"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.071402,
+          34.8701905
+        ]
+      },
+      "id": "node/9922362224"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9928663588",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.015875,
+          35.5166701
+        ]
+      },
+      "id": "node/9928663588"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9928663695",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0158639,
+          35.5166984
+        ]
+      },
+      "id": "node/9928663695"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9928665735",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "lane",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0151349,
+          35.5178221
+        ]
+      },
+      "id": "node/9928665735"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9928669636",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0160087,
+          35.5166892
+        ]
+      },
+      "id": "node/9928669636"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10044514918",
+        "emergency": "fire_hydrant",
+        "survey:date": "2022-09-22"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0232347,
+          35.5177913
+        ]
+      },
+      "id": "node/10044514918"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10044518917",
+        "emergency": "fire_hydrant",
+        "survey:date": "2022-09-22"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0221418,
+          35.5168425
+        ]
+      },
+      "id": "node/10044518917"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10044519017",
+        "emergency": "fire_hydrant",
+        "survey:date": "2022-09-22"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0229578,
+          35.5177847
+        ]
+      },
+      "id": "node/10044519017"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10044526817",
+        "emergency": "fire_hydrant",
+        "survey:date": "2022-09-22"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0231953,
+          35.5176009
+        ]
+      },
+      "id": "node/10044526817"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10044526818",
+        "emergency": "fire_hydrant",
+        "survey:date": "2022-09-22"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0224672,
+          35.5174458
+        ]
+      },
+      "id": "node/10044526818"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10121947755",
+        "access": "yes",
+        "amenity": "drinking_water",
+        "bottle": "yes",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.4733321,
+          35.366464
+        ]
+      },
+      "id": "node/10121947755"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10162394752",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.4580741,
+          35.0021083
+        ]
+      },
+      "id": "node/10162394752"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11062463505",
+        "colour": "red",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1339119,
+          35.341539
+        ]
+      },
+      "id": "node/11062463505"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11062478505",
+        "colour": "red",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1307207,
+          35.3408068
+        ]
+      },
+      "id": "node/11062478505"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11062479205",
+        "colour": "red",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1310372,
+          35.3403399
+        ]
+      },
+      "id": "node/11062479205"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11062480905",
+        "colour": "red",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1319465,
+          35.3398752
+        ]
+      },
+      "id": "node/11062480905"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11062482605",
+        "colour": "red",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1325063,
+          35.3392784
+        ]
+      },
+      "id": "node/11062482605"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11063482405",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1339981,
+          35.3406448
+        ]
+      },
+      "id": "node/11063482405"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11063691506",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.133189,
+          35.3374994
+        ]
+      },
+      "id": "node/11063691506"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11065685105",
+        "emergency": "fire_hydrant"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1303862,
+          35.3373866
+        ]
+      },
+      "id": "node/11065685105"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11065691205",
+        "emergency": "fire_hydrant"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1314949,
+          35.3374425
+        ]
+      },
+      "id": "node/11065691205"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11065695605",
+        "emergency": "fire_hydrant"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1322977,
+          35.3382994
+        ]
+      },
+      "id": "node/11065695605"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11067318305",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0311785,
+          35.5154044
+        ]
+      },
+      "id": "node/11067318305"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11067655006",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0250129,
+          35.5155395
+        ]
+      },
+      "id": "node/11067655006"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11067660005",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0238096,
+          35.5157183
+        ]
+      },
+      "id": "node/11067660005"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11068695771",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0259208,
+          35.5143726
+        ]
+      },
+      "id": "node/11068695771"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11068842805",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "lane",
+        "fire_hydrant:type": "underground"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0239283,
+          35.5143003
+        ]
+      },
+      "id": "node/11068842805"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11070053406",
+        "emergency": "fire_hydrant"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0169898,
+          35.5150056
+        ]
+      },
+      "id": "node/11070053406"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11070081005",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0191905,
+          35.5149156
+        ]
+      },
+      "id": "node/11070081005"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11071380605",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.020901,
+          35.5183642
+        ]
+      },
+      "id": "node/11071380605"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11073708707",
+        "emergency": "fire_hydrant"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0201287,
+          35.5166225
+        ]
+      },
+      "id": "node/11073708707"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11076522907",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0130325,
+          35.512363
+        ]
+      },
+      "id": "node/11076522907"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11076535305",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.009815,
+          35.5100893
+        ]
+      },
+      "id": "node/11076535305"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11076775005",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.4735994,
+          35.3693548
+        ]
+      },
+      "id": "node/11076775005"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11077282005",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.4740899,
+          35.3707728
+        ]
+      },
+      "id": "node/11077282005"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11077368405",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.4735878,
+          35.3706605
+        ]
+      },
+      "id": "node/11077368405"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11077622606",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.475852,
+          35.3700772
+        ]
+      },
+      "id": "node/11077622606"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11077623508",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.4797112,
+          35.3670795
+        ]
+      },
+      "id": "node/11077623508"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11078673406",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.4727692,
+          35.3696742
+        ]
+      },
+      "id": "node/11078673406"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11079012505",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.4771637,
+          35.367039
+        ]
+      },
+      "id": "node/11079012505"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11079049905",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.4888939,
+          35.3666688
+        ]
+      },
+      "id": "node/11079049905"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11079073305",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.4975192,
+          35.3674729
+        ]
+      },
+      "id": "node/11079073305"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11081466605",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.4718529,
+          35.3704021
+        ]
+      },
+      "id": "node/11081466605"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11085153205",
+        "emergency": "fire_hydrant"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.4558302,
+          35.3639495
+        ]
+      },
+      "id": "node/11085153205"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11085290105",
+        "emergency": "fire_hydrant"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.018543,
+          35.3956618
+        ]
+      },
+      "id": "node/11085290105"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11091090505",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1533237,
+          35.3392146
+        ]
+      },
+      "id": "node/11091090505"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11091609605",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1357486,
+          35.3379364
+        ]
+      },
+      "id": "node/11091609605"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11091609705",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "source": "survey 2023"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1483617,
+          35.3386993
+        ]
+      },
+      "id": "node/11091609705"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11149565508",
+        "emergency": "fire_hydrant"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.4719469,
+          35.3683009
+        ]
+      },
+      "id": "node/11149565508"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11153321120",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:type": "pillar",
+        "survey:date": "2023-08-29"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.4708452,
+          35.3693867
+        ]
+      },
+      "id": "node/11153321120"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11153321309",
+        "access": "yes",
+        "historic": "yes",
+        "man_made": "water_well",
+        "survey:date": "2023-08-29"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.4744125,
+          35.3675212
+        ]
+      },
+      "id": "node/11153321309"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11162425806",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "survey:date": "2023-09-02"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1341088,
+          35.3362141
+        ]
+      },
+      "id": "node/11162425806"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11355603571",
+        "ele": "1216",
+        "man_made": "water_well"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.1502779,
+          35.290349
+        ]
+      },
+      "id": "node/11355603571"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11891830469",
+        "emergency": "fire_hydrant"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          23.9106707,
+          35.4543942
+        ]
+      },
+      "id": "node/11891830469"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12021101176",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "lane",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0214424,
+          35.5143098
+        ]
+      },
+      "id": "node/12021101176"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12151915896",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.4618984,
+          35.2868939
+        ]
+      },
+      "id": "node/12151915896"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12152145950",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "lane",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.4645133,
+          35.2843094
+        ]
+      },
+      "id": "node/12152145950"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12152183735",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.4641795,
+          35.2840803
+        ]
+      },
+      "id": "node/12152183735"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12152191983",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "lane",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.4654385,
+          35.2826118
+        ]
+      },
+      "id": "node/12152191983"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13031809336",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.3655545,
+          35.3383997
+        ]
+      },
+      "id": "node/13031809336"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13041038538",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "lane",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.3845248,
+          35.332465
+        ]
+      },
+      "id": "node/13041038538"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13140709004",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0231419,
+          35.5166433
+        ]
+      },
+      "id": "node/13140709004"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13140835831",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.0313493,
+          35.5163296
+        ]
+      },
+      "id": "node/13140835831"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13147555617",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1317267,
+          35.336596
+        ]
+      },
+      "id": "node/13147555617"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13152650351",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "lane",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1347716,
+          35.3429212
+        ]
+      },
+      "id": "node/13152650351"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13152683101",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1361729,
+          35.3424483
+        ]
+      },
+      "id": "node/13152683101"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13152954817",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1233238,
+          35.3407376
+        ]
+      },
+      "id": "node/13152954817"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13153477662",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1349787,
+          35.3385456
+        ]
+      },
+      "id": "node/13153477662"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13204740445",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:position": "sidewalk",
+        "fire_hydrant:type": "pillar",
+        "ref": "0",
+        "water_source": "main"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.5867417,
+          35.0052315
+        ]
+      },
+      "id": "node/13204740445"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13806531948",
+        "man_made": "water_well",
+        "pump": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.0790152,
+          35.3365321
+        ]
+      },
+      "id": "node/13806531948"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13806531954",
+        "man_made": "water_well",
+        "pump": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.0770106,
+          35.3368468
+        ]
+      },
+      "id": "node/13806531954"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13806531955",
+        "man_made": "water_well",
+        "pump": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.0772287,
+          35.336947
+        ]
+      },
+      "id": "node/13806531955"
+    }
+  ]
+}

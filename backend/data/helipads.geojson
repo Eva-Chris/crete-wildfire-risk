@@ -1,0 +1,55 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2026-10-09T08:14:29Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1471142432",
+        "aeroway": "helipad"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.4579242,
+          35.156908
+        ]
+      },
+      "id": "node/1471142432"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1625211172",
+        "aeroway": "helipad"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          26.2949044,
+          35.3030847
+        ]
+      },
+      "id": "node/1625211172"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2495009059",
+        "aeroway": "helipad",
+        "iata": "HER",
+        "icao": "LGIR"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.1765762,
+          35.3378976
+        ]
+      },
+      "id": "node/2495009059"
+    }
+  ]
+}
