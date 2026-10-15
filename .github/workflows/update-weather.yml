@@ -24,7 +24,7 @@ jobs:
       - name: Keep the previous files as a fallback
         run: |
           mkdir -p /tmp/out
-          BASE=https://raw.githubusercontent.com/${{ github.repository }}/data
+          BASE=https://raw.githubusercontent.com/${{ github.repository }}/weather-data
           curl -fsS "$BASE/weather.json" -o /tmp/out/weather.json || true
           curl -fsS "$BASE/fwi.json" -o /tmp/out/fwi.json || true
 
@@ -40,4 +40,4 @@ jobs:
           cp /tmp/out/weather.json /tmp/out/fwi.json . 2>/dev/null || cp /tmp/out/*.json .
           git add *.json
           git commit -m "Update weather $(date -u +%FT%TZ)"
-          git push --force origin data-new:data
+          git push --force origin data-new:weather-data
