@@ -9,6 +9,7 @@ import { environment } from '../environments/environment';
 })
 export class RiskDataService {
   private apiUrl = environment.apiUrl;
+  //'http://127.0.0.1:8000/api'
 
   constructor(private http: HttpClient) {}
 
