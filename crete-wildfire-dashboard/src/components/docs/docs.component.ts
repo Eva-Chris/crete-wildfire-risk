@@ -83,9 +83,10 @@ export class DocsComponent implements OnInit {
     aspect: {
       nameEn: 'Aspect',
       nameEl: 'Προσανατολισμός (Aspect)',
-      howEn: 'How much of the zone faces south-west (hot, dry afternoon sun)',
+      howEn:
+        'How much of the zone faces south-south-west (hot, dry afternoon sun)',
       howEl:
-        'Τμήμα της ζώνης με νοτιοδυτικό προσανατολισμό (θερμός, ξηρός απογευματινός ήλιος)',
+        'Τμήμα της ζώνης με νότιο-νοτιοδυτικό προσανατολισμό (θερμός, ξηρός απογευματινός ήλιος)',
     },
     history: {
       nameEn: 'Fire history',
@@ -133,6 +134,12 @@ export class DocsComponent implements OnInit {
   breaks = signal<number[]>([]);
   trainEnd = signal(2021);
   validation = signal<Validation | null>(null);
+  zoneCount = signal<number | null>(null);
+  fwiVal = signal<{
+    n_fire_days: number;
+    auc_fwi: number;
+    auc_simple: number;
+  } | null>(null);
   status = signal<'loading' | 'ok' | 'empty' | 'error'>('loading');
 
   /** Rows of the reliability table */
@@ -141,8 +148,14 @@ export class DocsComponent implements OnInit {
     if (!v) return [];
     const isEl = this.langService.currentLang() === 'el';
 
+    const ci = v.auc_model_ci
+      ? ` (${isEl ? '95% διάστημα' : '95% CI'} ${v.auc_model_ci[0]} – ${v.auc_model_ci[1]})`
+      : '';
     const rows = [
-      { label: isEl ? 'Αυτό το μοντέλο' : 'This model', auc: v.auc_model },
+      {
+        label: (isEl ? 'Αυτό το μοντέλο' : 'This model') + ci,
+        auc: v.auc_model,
+      },
     ];
     if (v.auc_previous !== null)
       rows.push({
@@ -174,6 +187,9 @@ export class DocsComponent implements OnInit {
         this.weights.set(w);
         this.breaks.set(m?.breaks ?? []);
         if (typeof m?.train_end === 'number') this.trainEnd.set(m.train_end);
+        if (typeof m?.n_zones === 'number')
+          this.zoneCount.set(Math.round(m.n_zones / 100) * 100);
+        this.fwiVal.set(m?.fwi_validation ?? null);
         this.validation.set(m?.validation ?? null);
         this.status.set(w.length ? 'ok' : 'empty');
       },

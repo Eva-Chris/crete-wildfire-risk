@@ -9,14 +9,14 @@
 
 ## Inputs for `build_road_network.py` (drive-time coverage)
 
-| File                    | What it is                                          | Where it comes from                                                                                                                                                                     |
-| :---------------------- | :-------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `greece-latest.osm.pbf` | OpenStreetMap extract for Greece (a few hundred MB) | [Geofabrik](https://download.geofabrik.de/europe/greece-latest.osm.pbf), ODbL. Downloaded automatically on the first run if missing, or save it here yourself. Do not commit it to Git. |
+| File                    | What it is                                          | Where it comes from                                                                                                                                       |
+| :---------------------- | :-------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `greece-latest.osm.pbf` | OpenStreetMap extract for Greece (a few hundred MB) | [Geofabrik](https://download.geofabrik.de/europe/greece-latest.osm.pbf), ODbL. Downloaded automatically on the first run if missing, or save it yourself. |
 
-**Output:** `road_graph.npz` — a compact drivable road graph for Crete (nodes, directed edges, travel time in seconds per edge).
+**Output:** `road_graph.npz` - a compact drivable road graph for Crete (nodes, directed edges, travel time in seconds per edge).
 
 - Only drivable road classes are used. Dirt tracks, private ways and motor-vehicle-free ways are excluded.
-- Travel times use **assumed fire-engine speeds by road class** (`CLASS_SPEED_KMH` in `build_road_network.py`), lowered where a tagged speed limit is slower. These are assumptions, not measurements. Adjust them with someone from the fire service.
+- Travel times use **assumed fire-engine speeds by road class** (`CLASS_SPEED_KMH` in `build_road_network.py`), lowered where a tagged speed limit is slower. These are assumptions, not measurements. Should be adjusted with someone from the fire service.
 - Restart the API after rebuilding the graph, because it loads the file once at start-up.
 - **If `road_graph.npz` is missing, the app still works** in straight-line mode only. The "By road" option is hidden.
 

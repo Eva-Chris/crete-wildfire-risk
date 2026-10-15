@@ -355,6 +355,17 @@ def burned_fraction(forests: gpd.GeoDataFrame, burnt_union) -> pd.Series:
     area = x.area.groupby(x["_id"]).sum()
     return (forests["_id"].map(area).fillna(0) / forests.area).clip(0, 1)
 
+def bootstrap_auc_ci(y, score, n=1000, seed=0):
+    from sklearn.metrics import roc_auc_score
+    rng = np.random.default_rng(seed)
+    y, s = np.asarray(y), np.asarray(score)
+    out = []
+    for _ in range(n):
+        i = rng.integers(0, len(y), len(y))
+        if y[i].min() != y[i].max():
+            out.append(roc_auc_score(y[i], s[i]))
+    return [round(float(np.percentile(out, 2.5)), 2), round(float(np.percentile(out, 97.5)), 2)]
+
 
 # =========================================================================== #
 # Main
@@ -501,6 +512,13 @@ def main() -> None:
         else:
             auc_new = roc_auc_score(label, forests["static_risk_score"])
             say(f"  AUC new model : {auc_new:.3f}")
+            size = pd.qcut(forests.area / 10_000, 3, labels=["small", "medium", "large"])
+            say("  AUC by zone size (checks that big zones aren't driving the result):")
+            for name in size.cat.categories:
+                m = (size == name).to_numpy()
+                if label[m].nunique() == 2:
+                    a = roc_auc_score(label[m], forests.loc[m, "static_risk_score"])
+                    say(f"    {name:<7} AUC {a:.3f}  (n={m.sum()}, burned={int(label[m].sum())})")
             auc_old = None
             if "old_score" in forests:
                 auc_old = roc_auc_score(label, forests["old_score"])
@@ -515,6 +533,7 @@ def main() -> None:
                 "n_positive": n_pos,
                 "min_burned_frac": BURNED_MIN_FRAC,
                 "auc_model": round(auc_new, 2),
+                "auc_model_ci": bootstrap_auc_ci(label, forests["static_risk_score"]),
                 "auc_previous": None if auc_old is None else round(auc_old, 2),
                 "auc_factors": auc_factors,
             }
@@ -534,10 +553,16 @@ def main() -> None:
     out[round_cols] = out[round_cols].round(1)
     out.to_file(HERE / FOREST_OUT, driver="GeoJSON")
 
-    model = {"weights": weights, "breaks": breaks, "train_end": TRAIN_END, "validation": validation}
+    model = {"weights": weights, "breaks": breaks, "train_end": TRAIN_END,
+             "n_zones": int(len(forests)), "validation": validation}
     if fuel_table is not None:
         model["fuel_scores"] = {str(k): v for k, v in sorted(fuel_table.items())}
-    (HERE / MODEL_OUT).write_text(json.dumps(model, indent=1))
+    mp = HERE / MODEL_OUT
+    if mp.exists():                      # keep what validate_fwi.py wrote
+        old = json.loads(mp.read_text())
+        if "fwi_validation" in old:
+            model["fwi_validation"] = old["fwi_validation"]
+    mp.write_text(json.dumps(model, indent=1))
     say(f"\nDone. Wrote {FOREST_OUT} and {MODEL_OUT}. Restart the API to pick them up.")
 
 

@@ -29,17 +29,21 @@
             <h2>Τι είναι αυτό το εργαλείο</h2>
             <p>Ο χάρτης αποτελείται από τρία μέρη που λειτουργούν συνδυαστικά:</p>
             <ul>
-                <li><b>Ζώνες κινδύνου.</b> Περίπου 1.300 δασικές ζώνες, καθεμία με έναν στατικό δείκτη ευπάθειας από 0
+                <li><b>Ζώνες κινδύνου.</b> Περίπου {{ zoneCount() ?? '…' }} δασικές ζώνες, καθεμία με έναν
+                    στατικό δείκτη ευπάθειας από 0
                     έως 100.</li>
                 <li><b>Κάλυψη ανταπόκρισης.</b> Ποιες ζώνες υψηλού κινδύνου απέχουν πολύ από κάποιον πυροσβεστικό
                     σταθμό,
                     και τι αλλάζει αν προσθέσετε έναν προτεινόμενο σταθμό.</li>
-                <li><b>Έκθεση οικισμών.</b> Ποιους οικισμoύς περιβάλλει το περισσότερο δάσος υψηλού κινδύνου,
+                <li><b>Έκθεση οικισμών.</b> Ποιους οικισμούς περιβάλλει το περισσότερο δάσος υψηλού κινδύνου,
                     και αν αυτοί καλύπτονται επαρκώς.</li>
             </ul>
             <p>
-                Ως «ευπάθεια» νοείται το πού είναι πιο πιθανό να καούν οι εκτάσεις αν εκδηλωθεί πυρκαγιά.
-                Δεν αποτελεί πρόβλεψη για το πού ή πότε θα ξεκινήσουν πυρκαγιές.
+                Ως «ευπάθεια» νοείται πόσο εύκολα αναμένεται να καεί μια ζώνη και πόσο εκτεθειμένη είναι σε ανθρώπους
+                και
+                υποδομές. Ορισμένοι παράγοντες (δίκτυο ρεύματος, δρόμοι, οικισμοί) αποτελούν δείκτες έναρξης και έκθεσης
+                και
+                όχι καύσιμης ύλης ή ανάγλυφου. Δεν αποτελεί πρόβλεψη για το πού ή πότε θα ξεκινήσουν πυρκαγιές.
             </p>
         </section>
 
@@ -133,7 +137,8 @@
                 από την ίδια μέρα μετά από μια μακρά περίοδο ξηρασίας.
             </p>
             <ul>
-                <li>Υπολογίζεται σε οκτώ μετεωρολογικούς σταθμούς με βάση τα δεδομένα μεσημβρινού καιρού του Open-Meteo,
+                <li>Υπολογίζεται σε οκτώ μετεωρολογικούς σταθμούς με βάση τα δεδομένα μεσημεριανού καιρού του
+                    Open-Meteo,
                     τρέχοντας μέρα με τη μέρα από την 1η Μαρτίου, συν μια σύντομη πρόγνωση.</li>
                 <li>Κάθε ζώνη συνδέεται με τον πλησιέστερο σταθμό της και το αναδυόμενο παράθυρό (popup) εμφανίζει τον
                     δείκτη του σταθμού αυτού.</li>
@@ -195,9 +200,16 @@
                 <li>Ένας παράγοντας κοντά στο 0.5 δεν έχει προβλεπτική ικανότητα από μόνος του. Η καύσιμη ύλη είναι
                     τυπικό παράδειγμα:
                     η φρυγανώδης βλάστηση (maquis) καλύπτει το μεγαλύτερο μέρος των ζωνών, οπότε υπάρχει ελάχιστη
-                    αντίθεση μεταξύ τους.</li>
+                    αντίθεση μεταξύ τους, και τα ποσοστά καύσης στηρίζονται σε μικρό αριθμό πυρκαγιών.</li>
                 <li>Τα βάρη αποτελούν εμπειρικές εκτιμήσεις ειδικών και δεν προσαρμόστηκαν βάσει των πυρκαγιών δοκιμής,
                     διατηρώντας την αξιοπιστία του τεστ.</li>
+                <li>Το ιστορικό πυρκαγιών μπορεί να βαθμολογείται κοντά ή κάτω από 0.5. Στα μεσογειακά τοπία μια καμένη
+                    έκταση
+                    έχει λίγη καύσιμη ύλη για αρκετά χρόνια, οπότε οι πρόσφατα καμένες ζώνες μπορεί να είναι λιγότερο
+                    πιθανό να
+                    καούν ξανά σύντομα, κάτι που λειτουργεί εις βάρος αυτού του παράγοντα. Δείτε τη γραμμή του στον
+                    πίνακα για την
+                    τρέχουσα τιμή.</li>
             </ul>
             } @else {
             <p>Τα αποτελέσματα επικύρωσης δεν είναι διαθέσιμα. Εκτελέστε το <code>build_static_risk.py</code> έχοντας
@@ -209,9 +221,11 @@
             <p>
                 Ελέγξαμε κατά πόσον ο δείκτης FWI διαχώριζε τις ημέρες με μεγάλες χαρτογραφημένες πυρκαγιές από άλλες
                 καλοκαιρινές ημέρες
-                (Ιούνιος έως Σεπτέμβριος, από το 2016 και μετά, σε 8 σταθμούς· συνολικά 38 ημέρες πυρκαγιάς). Ο
+                (Ιούνιος έως Σεπτέμβριος, από το 2016 και μετά, σε 8 σταθμούς· συνολικά {{ fwiVal()?.n_fire_days ?? '…'
+                }} ημέρες πυρκαγιάς). Ο
                 διαχωρισμός ήταν ασθενής
-                (AUC 0.64), παρόμοιος με έναν απλό δείκτη θερμοκρασίας, ανέμου και υγρασίας (0.65). Με τόσες λίγες
+                (AUC {{ fwiVal()?.auc_fwi ?? '…' }}), παρόμοιος με έναν απλό δείκτη θερμοκρασίας, ανέμου και υγρασίας
+                ({{ fwiVal()?.auc_simple ?? '…' }}). Με τόσες λίγες
                 ημέρες πυρκαγιάς,
                 η διαφορά εμπίπτει στα όρια αβεβαιότητας. Χρησιμοποιούμε το FWI επειδή αποτελεί το καθιερωμένο πρότυπο
                 του EFFIS
@@ -298,8 +312,9 @@
                     </tr>
                     <tr>
                         <td>Ανάγλυφο (Terrain)</td>
-                        <td>EU-DEM (Copernicus Digital Elevation Model), επαναδειγματοληψία στα 25 m</td>
-                        <td>Υπολογισμός κλίσης και προσανατολισμού μέσω QGIS</td>
+                        <td>EU-DEM (Copernicus Digital Elevation Model), μετατροπή προβολής σε ανάλυση 30 m</td>
+                        <td>Η κλίση υπολογίστηκε στο QGIS· ο προσανατολισμός και το υψόμετρο υπολογίστηκαν σε Python από
+                            το επαναπροβαλλόμενο DEM</td>
                     </tr>
                     <tr>
                         <td>Καιρός & Δείκτης FWI</td>
@@ -349,6 +364,12 @@
                     συνόλου δεδομένων. Εθελοντικές ομάδες, μονάδες της Δασικής Υπηρεσίας ή άλλοι πόροι μπορεί να
                     λείπουν,
                     οπότε ο αριθμός των μη καλυμμένων ζωνών μπορεί να είναι υπερεκτιμημένος.</li>
+                <li><b>Κορεσμένοι παράγοντες.</b> Σε πολλές ζώνες ένας δρόμος ή μια γραμμή ρεύματος αγγίζει τη ζώνη,
+                    οπότε οι παράγοντες αυτοί βαθμολογούνται με 100 και διαφοροποιούν ελάχιστα τις ζώνες.</li>
+                <li><b>Ο παράγοντας με το μεγαλύτερο βάρος δεν έδειξε προβλεπτική ικανότητα.</b> Η καύσιμη ύλη έχει το
+                    μεγαλύτερο βάρος, αλλά δεν διαχώρισε τις ζώνες που κάηκαν από τις υπόλοιπες στον τελευταίο έλεγχο.
+                    Τα βάρη
+                    δεν άλλαξαν εκ των υστέρων, ώστε να διατηρηθεί η αξιοπιστία του τεστ.</li>
             </ul>
         </section>
 
@@ -364,7 +385,7 @@
 
             <details>
                 <summary>Γιατί ακριβώς το 20% των ζωνών είναι πάντα «Πολύ υψηλού» κινδύνου;</summary>
-                <p>Οι κατηγορίες βασίζονται σε εκατημοριακές ζώνες, οπότε καθεμία περιέχει σταθερό ποσοστό περιοχών.
+                <p>Οι κατηγορίες βασίζονται σε εκατοστημοριακές ζώνες, οπότε καθεμία περιέχει σταθερό ποσοστό περιοχών.
                     Αυτό κάνει τον χάρτη εύκολο στην ανάγνωση, αλλά σημαίνει ότι οι κατηγορίες δεν δείχνουν αν ολόκληρο
                     το νησί
                     είναι ασφαλές ή επικίνδυνο μια συγκεκριμένη ημέρα.</p>
@@ -437,6 +458,12 @@
                     εκτελέσετε.
                 </p>
             </details>
+            <details>
+                <summary>Γιατί δεν δίνεται μεγαλύτερο βάρος στον παράγοντα με την καλύτερη βαθμολογία;</summary>
+                <p>Επειδή οι πυρκαγιές του ελέγχου είναι η μόνη μας απόδειξη. Αν προσαρμόσουμε τα βάρη σε αυτές, τα
+                    αποτελέσματα θα φαίνονται καλύτερα χωρίς το μοντέλο να γίνεται πιο αξιόπιστο. Χρειάζεται μεγαλύτερο
+                    ιστορικό πυρκαγιών για να βαθμονομηθούν τα βάρη με ειλικρίνεια.</p>
+            </details>
         </section>
 
         <footer class="small">Τελευταία ενημέρωση: <i>Οκτώβριος 2026</i> · Έκδοση 2.0 · Δημιουργός: <i>Εύα
@@ -474,7 +501,8 @@
             <h2>What this tool is</h2>
             <p>The map has three parts that work together:</p>
             <ul>
-                <li><b>Risk zones.</b> About 1,300 forest zones, each with a static susceptibility score from 0 to 100.
+                <li><b>Risk zones.</b>About {{ zoneCount() ?? '...' }} forest zones, each with a static susceptibility
+                    score from 0 to 100.
                 </li>
                 <li><b>Response coverage.</b> Which high-risk zones are far from a fire station, and what changes if you
                     add a proposed one.</li>
@@ -482,8 +510,9 @@
                     whether they are covered.</li>
             </ul>
             <p>
-                "Susceptibility" means where fires are more likely to burn if they start. It is not a
-                prediction of where fires will start or when.
+                "Susceptibility" means how readily a zone is expected to burn and how exposed it is to people and
+                infrastructure. Some factors (power lines, roads, settlements) are proxies for ignition and exposure,
+                not for fuel or terrain. It is not a prediction of where fires will start or when.
             </p>
         </section>
 
@@ -617,6 +646,11 @@
                     zone area, so there is little contrast between zones, and the burn rates rest on a small number of
                     fires.</li>
                 <li>Weights are expert placeholders and were not tuned on the test fires, so the test stays fair.</li>
+                <li>Fire history can score close to or below 0.5. In Mediterranean landscapes a burned area has little
+                    fuel for
+                    several years, so recently burned zones may be less likely to burn again soon, which works against
+                    this
+                    factor. Check its row in the table for the current value.</li>
             </ul>
             } @else {
             <p>Validation results are not available. Run <code>build_static_risk.py</code> with the burnt-area file
@@ -626,8 +660,10 @@
             <h3>Fire Weather Index</h3>
             <p>
                 We checked whether the Fire Weather Index separated days with a large mapped fire from other
-                summer days (June to September, 2016 onward, eight stations; 38 fire days). It did so only weakly
-                (AUC 0.64), about the same as a simple temperature, wind and humidity index (0.65). With so few
+                summer days (June to September, 2016 onward, eight stations; {{ fwiVal()?.n_fire_days ?? '…' }} fire
+                days). It did so only weakly
+                (AUC {{ fwiVal()?.auc_fwi ?? '…' }}), about the same as a simple temperature, wind and humidity index
+                ({{ fwiVal()?.auc_simple ?? '…' }}). With so few
                 fire days the difference is within the uncertainty. We use the FWI because it is the standard
                 used by EFFIS, not because it was shown to be more accurate here. In Crete's summer the index is
                 in the "High" range on most days, so use it to compare days and places, not as a fire alarm.
@@ -699,8 +735,8 @@
                     </tr>
                     <tr>
                         <td>Terrain</td>
-                        <td>EU-DEM (Copernicus Digital Elevation Model), resampled to 25 m</td>
-                        <td>Slope and aspect derived via QGIS raster analysis</td>
+                        <td>EU-DEM (Copernicus Digital Elevation Model), resampled to 30 m</td>
+                        <td>Slope derived in QGIS; aspect and elevation computed in Python from the reprojected DEM</td>
                     </tr>
                     <tr>
                         <td>Weather and Fire Weather Index</td>
@@ -745,6 +781,12 @@
                 <li><b>Station data may be incomplete.</b> Coverage counts only the stations in the dataset. Volunteer
                     brigades, forest service units or other resources may be missing, so uncovered numbers can be
                     overstated.</li>
+                <li><b>Saturated factors.</b> In many zones a road or power line touches the zone, so those factors
+                    score 100 and distinguish little between zones.</li>
+                <li><b>The heaviest factor showed no skill.</b> Fuel carries the largest weight but did not separate
+                    burned
+                    from unburned zones in the latest test. The weights were not changed afterwards, to keep the test
+                    fair.</li>
 
             </ul>
         </section>
@@ -824,6 +866,12 @@
                     <code>model.json</code> file the app reads. The README in the repository explains how to run it
                     and how the input zones were prepared.
                 </p>
+            </details>
+            <details>
+                <summary>Why not give more weight to the factor that scored best?</summary>
+                <p>Because the test fires are the only evidence we have. Tuning the weights to them would make the test
+                    results look better without making the model more reliable. A longer fire record is needed before
+                    the weights can be calibrated honestly.</p>
             </details>
         </section>
 

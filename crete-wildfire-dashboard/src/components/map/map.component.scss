@@ -48,22 +48,26 @@ app-map .dashboard-container {
       outline: 2px solid var(--focus);
       outline-offset: 2px;
     }
+  }
 
-    .reach-legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px 10px;
-      margin-top: 10px;
-      font-size: 0.72rem;
-      color: var(--ink-2);
-      i {
-        display: inline-block;
-        width: 16px;
-        height: 4px;
-        margin-right: 4px;
-        border-radius: 2px;
-        vertical-align: middle;
-      }
+  .reach-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    margin-top: 10px;
+    font-size: 0.72rem;
+    color: var(--ink-2);
+    i {
+      display: inline-block;
+      width: 16px;
+      height: 4px;
+      margin-right: 4px;
+      border-radius: 2px;
+      vertical-align: middle;
+    }
+    .hint {
+      flex: 0 0 100%;
+      margin-top: 4px;
     }
   }
 
@@ -1014,6 +1018,15 @@ app-map {
 }
 .more {
   margin-top: 6px;
+}
+
+.leaflet-hydro-pane canvas,
+.leaflet-roads-pane canvas,
+.leaflet-power-pane canvas,
+.leaflet-burned-pane canvas,
+.leaflet-reach-pane canvas,
+.leaflet-coverage-pane canvas {
+  pointer-events: none;
 }
 
 @keyframes spin {

@@ -8,6 +8,7 @@ pair with an EFFIS fire whose centroid is nearest to that station.
 Run from this folder:  python validate_fwi.py
 Downloads ERA5 noon weather from Open-Meteo once per year and caches it in data/noon_<year>.pkl.
 """
+import json
 import time
 from pathlib import Path
 
@@ -22,6 +23,7 @@ from stations import STATIONS, nearest_station_ids
 
 HERE = Path(__file__).resolve().parent
 BURNT = HERE / "data/burned_areas_crete_small.geojson"
+model_path = HERE / "model.json"
 YEARS = range(2016, pd.Timestamp.now().year + 1)
 HIGH_FWI = 21.3     # lower bound of the EFFIS "High" class
 
@@ -70,6 +72,14 @@ def main():
     for c in ("fwi", "isi", "bui", "ffmc", "old"):
         print(f"  AUC {c:<5} {roc_auc_score(df['fire'], df[c]):.3f}")
     hi = df["fwi"] >= HIGH_FWI
+    model = json.loads(model_path.read_text()) if model_path.exists() else {}
+    model["fwi_validation"] = {
+        "n_fire_days": int(df["fire"].sum()),
+        "auc_fwi": round(float(roc_auc_score(df["fire"], df["fwi"])), 2),
+        "auc_simple": round(float(roc_auc_score(df["fire"], df["old"])), 2),
+    }
+    model_path.write_text(json.dumps(model, indent=1))
+    print("Wrote fwi_validation to model.json")
     print(f"  share of fire days with FWI >= {HIGH_FWI} (High): {hi[df['fire'] == 1].mean():.0%}"
           f" vs {hi[df['fire'] == 0].mean():.0%} of other days")
 

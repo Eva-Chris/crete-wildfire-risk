@@ -391,10 +391,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private roadReq?: Subscription;
 
   private reachLayer?: L.GeoJSON;
-  private reachRenderer?: L.Renderer;
   private gapLayer?: L.LayerGroup;
   private reachReq?: Subscription;
   private reachTimer?: ReturnType<typeof setTimeout>;
+
+  private canvases = new Map<string, L.Canvas>();
 
   /** "Add proposed station" mode, and the stations placed so far (not saved anywhere). */
   placing = false;
@@ -441,6 +442,19 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     return this.zone.runOutsideAngular(fn);
   }
 
+  /**
+   * One canvas per pane, for layers that only draw. A canvas catches every mouse event over the
+   * whole map, so these panes are made click-through in map.component.scss.
+   */
+  private canvas(pane: string): L.Canvas {
+    let c = this.canvases.get(pane);
+    if (!c) {
+      c = L.canvas({ pane, padding: 0.5 });
+      this.canvases.set(pane, c);
+    }
+    return c;
+  }
+
   private loadModel(): void {
     this.api.getModel().subscribe({
       next: (m: ModelResponse) => {
@@ -469,7 +483,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   /* ---------------- map setup ---------------- */
   private initMap(): void {
     this.map = L.map('map', {
-      preferCanvas: true,
       zoomControl: false,
       zoomSnap: 0.5,
       minZoom: 8,
@@ -684,17 +697,20 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     const p = f?.properties;
     const cls = classify(scoreOf(p));
     const byScore = this.colorBy === 'score';
+    const renderer = this.canvas('forestsPane');
     if (byScore && this.hiddenClasses.has(cls))
-      return { fill: false, stroke: false };
+      return { fill: false, stroke: false, interactive: false, renderer };
     const base: L.PathOptions = {
       fill: true,
       stroke: true,
+      interactive: true,
       fillColor: byScore ? RISK_CLASSES[cls].color : this.factorColor(p),
       fillOpacity: this.forestOpacity,
       color: '#1f2937',
       weight: 0.35,
       opacity: 0.45,
       dashArray: '',
+      renderer,
     };
     if (!this.coverageOn) return base;
 
@@ -756,6 +772,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       if (this.coverageOn && !this.byRoad) {
         const circle = (ll: L.LatLng, proposed: boolean) =>
           L.circle(ll, {
+            renderer: this.canvas('coveragePane'),
             pane: 'coveragePane',
             radius: this.coverageKm * 1000,
             interactive: false,
@@ -833,8 +850,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       }
       this.hypoDist.set(f.properties, d);
     }
-    this.applyCoverage();
     this.cdr.markForCheck();
+    if (!this.byRoad) this.applyCoverage();
     this.fetchRoadHypo();
   }
 
@@ -971,13 +988,23 @@ export class MapComponent implements AfterViewInit, OnDestroy {
           pane: 'powerPane',
           interactive: false,
           pointToLayer: strayPoint,
-          style: { color: '#f6ad55', weight: 6, opacity: 0.25 },
+          style: {
+            color: '#f6ad55',
+            weight: 6,
+            opacity: 0.25,
+            renderer: this.canvas('powerPane'),
+          },
         });
         const core = L.geoJSON(data, {
           pane: 'powerPane',
           interactive: false,
           pointToLayer: strayPoint,
-          style: { color: '#b7791f', weight: 1.6, opacity: 0.95 },
+          style: {
+            color: '#b7791f',
+            weight: 1.6,
+            opacity: 0.95,
+            renderer: this.canvas('powerPane'),
+          },
         });
         return L.layerGroup([glow, core]);
       }
@@ -987,6 +1014,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
           interactive: false,
           pointToLayer: (_f, ll) =>
             L.circleMarker(ll, {
+              renderer: this.canvas('powerPane'),
               pane: 'powerPane',
               radius: 3,
               fillColor: '#4b5563',
@@ -1042,7 +1070,12 @@ export class MapComponent implements AfterViewInit, OnDestroy {
           pane: 'hydroPane',
           interactive: false,
           pointToLayer: strayPoint,
-          style: { color: '#1f78b4', weight: 1.4, opacity: 0.85 },
+          style: {
+            color: '#1f78b4',
+            weight: 1.4,
+            opacity: 0.85,
+            renderer: this.canvas('hydroPane'),
+          },
         });
       case 'lakes':
         return L.geoJSON(data, {
@@ -1050,6 +1083,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
           interactive: false,
           pointToLayer: strayPoint,
           style: {
+            renderer: this.canvas('hydroPane'),
             fillColor: '#6baed6',
             color: '#1f78b4',
             weight: 1,
@@ -1061,7 +1095,12 @@ export class MapComponent implements AfterViewInit, OnDestroy {
           pane: 'roadsPane',
           interactive: false,
           pointToLayer: strayPoint,
-          style: { color: '#fb8c2a', weight: 0.9, opacity: 0.7 },
+          style: {
+            color: '#fb8c2a',
+            weight: 0.9,
+            opacity: 0.7,
+            renderer: this.canvas('roadsPane'),
+          },
         });
       case 'fireStations': {
         const pts = asPoints(data);
@@ -1134,13 +1173,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
           },
         });
       case 'waterPoints': {
-        const renderer = L.canvas({ pane: 'responsePane', padding: 0.5 });
         return L.geoJSON(asPoints(data), {
           pane: 'responsePane',
           pointToLayer: (f, ll) => {
             const hydrant = hydrantOf(f.properties ?? {});
             return L.circleMarker(ll, {
-              renderer,
               radius: hydrant ? 4 : 5,
               fillColor: hydrant ? '#06b6d4' : '#1e3a8a',
               fillOpacity: 0.95,
@@ -1298,11 +1335,12 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   /* ---------------- burned areas ---------------- */
   private burnedStyle(f?: Feat): L.PathOptions {
+    const renderer = this.canvas('burnedPane');
     const y = f?.properties?.['year'];
     if (!isNum(y) || y < this.burnedFrom || y > this.burnedTo) {
-      return { fill: false, stroke: false };
+      return { fill: false, stroke: false, renderer };
     }
-    const late = y > this.trainEnd; // validation period
+    const late = y > this.trainEnd;
     return {
       fill: true,
       stroke: true,
@@ -1311,6 +1349,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       color: late ? '#4c1d95' : '#334155',
       weight: 1.2,
       opacity: 0.9,
+      renderer,
     };
   }
 
@@ -1510,11 +1549,16 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       .join('');
     return `
     <div class="pop">
-      <h4>${esc(r.name)}</h4>
+      <h4>${esc(r.name || tr('Settlement'))}</h4>
       <div class="row"><span>${tr('High-risk forest within 1 km')}</span><b>${r.ha.toFixed(0)} ha (${(r.share * 100).toFixed(0)}%)</b></div>
        ${
          r.byRoad
-           ? `<div class="row"><span>${tr('Drive time to nearest station')}</span><b>${r.stationMin === null ? '> ' + this.roadMax + ' min' : r.stationMin.toFixed(0) + ' min'}</b></div>
+           ? `<div class="row"><span>${tr('Drive time to nearest station')}</span><b>${
+               r.stationMin === null
+                 ? tr('>{n} min', { n: this.roadMax })
+                 : tr('{n} min', { n: r.stationMin.toFixed(0) })
+             }</b></div>
+           
              <div class="row"><span>${tr('Status at {min} min', { min: this.driveMin })}</span><b style="color:${r.covered ? '#166534' : '#991b1b'}">${tr(r.covered ? 'covered' : 'uncovered')}</b></div>`
            : `<div class="row"><span>${tr('Nearest fire station')}</span><b>${r.stationKm.toFixed(1)} km</b></div>
              <div class="row"><span>${tr('Status at {km} km', { km: this.coverageKm })}</span><b style="color:${r.covered ? '#166534' : '#991b1b'}">${tr(r.covered ? 'covered' : 'uncovered')}</b></div>`
@@ -1554,21 +1598,17 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         tr('Scoring'),
         tr('Static susceptibility score (no weather adjustment)'),
       ],
-      [
-        this.byRoad
-          ? [tr('Drive time limit (min)'), this.driveMin]
-          : [tr('Coverage radius (km)'), this.coverageKm],
-      ],
+      this.byRoad
+        ? [tr('Drive time limit (min)'), this.driveMin]
+        : [tr('Coverage radius (km)'), this.coverageKm],
       [tr('Proposed stations'), this.hypo.length],
       [
-        [
-          tr('Note'),
-          tr(
-            this.byRoad
-              ? 'Drive times along OpenStreetMap roads at assumed fire-engine speeds. High risk = top two percentile classes of the score.'
-              : 'Straight-line distances. High risk = top two percentile classes of the score.',
-          ),
-        ],
+        tr('Note'),
+        tr(
+          this.byRoad
+            ? 'Drive times along OpenStreetMap roads at assumed fire-engine speeds. High risk = top two percentile classes of the score.'
+            : 'Straight-line distances. High risk = top two percentile classes of the score.',
+        ),
       ],
     ]);
     info['!cols'] = [{ wch: 24 }, { wch: 80 }];
@@ -1655,7 +1695,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     if (!this.hypo.length) {
       this.roadHypo = null;
       this.roadWarn = null;
-      this.applyCoverage();
+      if (this.byRoad) this.applyCoverage();
       return;
     }
     const pts = this.hypo.map((m): [number, number] => [
@@ -1668,7 +1708,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         this.roadWarn = (r.snap_m ?? []).some((d) => d > 500)
           ? 'A proposed station is more than 500 m from the nearest road, so its drive times include a slow off-road leg.'
           : null;
-        this.applyCoverage();
+        if (this.byRoad) this.applyCoverage();
+        this.cdr.markForCheck();
       },
       error: () => {
         this.error = this.tr(
@@ -1719,7 +1760,13 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       this.gapLayer = L.layerGroup([
         L.geoJSON(fc, {
           ...common,
-          style: { fill: false, color: '#ffffff', weight: 4.5, opacity: 0.9 },
+          style: {
+            fill: false,
+            color: '#ffffff',
+            weight: 4.5,
+            opacity: 0.9,
+            renderer: this.canvas('coveragePane'),
+          },
         }),
         L.geoJSON(fc, {
           ...common,
@@ -1729,6 +1776,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
             weight: 2,
             opacity: 1,
             dashArray: '6 4',
+            renderer: this.canvas('coveragePane'),
           },
         }),
       ]).addTo(this.map);
@@ -1760,9 +1808,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
               interactive: false,
               pointToLayer: strayPoint,
               style: (f) => ({
-                renderer: (this.reachRenderer ??= L.canvas({
-                  pane: 'reachPane',
-                })),
+                renderer: this.canvas('reachPane'),
                 color: this.bandColor(f?.properties?.['band'] ?? 15),
                 weight: 2.6,
                 opacity: 0.95,

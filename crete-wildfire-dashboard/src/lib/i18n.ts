@@ -55,7 +55,7 @@ const EL: Record<string, string> = {
 
   '>{n} min': '>{n} λεπτά',
   '{n} min': '{n} λεπτά',
-  '{n} km': '{n} χλμ',
+  '{n} km': '{n} km',
   'Coloured roads show how far a fire engine gets from the nearest station, in 5-minute bands.':
     'Οι χρωματισμένοι δρόμοι δείχνουν πόσο μακριά φτάνει ένα πυροσβεστικό όχημα από τον πλησιέστερο σταθμό, ανά 5 λεπτά.',
 
@@ -83,7 +83,7 @@ const EL: Record<string, string> = {
   'Fuel (land cover)': 'Καύσιμη ύλη (κάλυψη γης)',
   Slope: 'Κλίση εδάφους',
   Aspect: 'Προσανατολισμός',
-  'Aspect (SW-facing)': 'Προσανατολισμός (νοτιοδυτικός)',
+  'Aspect (SSW-facing)': 'Προσανατολισμός (νότιο-νοτιοδυτικός)',
   'Fire history': 'Ιστορικό πυρκαγιών',
   'Close to power grid': 'Εγγύτητα σε δίκτυο ηλεκτροδότησης',
   'Close to roads': 'Εγγύτητα σε οδικό δίκτυο',
@@ -92,8 +92,8 @@ const EL: Record<string, string> = {
     'Πόσο εύκολα καίγεται η κάλυψη γης CORINE της ζώνης.',
   'Mean slope, steeper scores higher.':
     'Μέση κλίση· οι πιο απότομες πλαγιές βαθμολογούνται υψηλότερα.',
-  'How much of the zone faces the hot, dry south-west.':
-    'Πόσο μέρος της ζώνης έχει νοτιοδυτικό προσανατολισμό (θερμό και ξηρό).',
+  'How much of the zone faces the hot, dry south-south-west.':
+    'Πόσο μέρος της ζώνης έχει νότιο-νοτιοδυτικό προσανατολισμό (θερμό και ξηρό).',
   'Closer to power lines scores higher (2 km cap).':
     'Όσο πιο κοντά σε γραμμές ρεύματος, τόσο υψηλότερη η βαθμολογία (όριο 2 km).',
   'Closer to roads scores higher (1 km cap).':

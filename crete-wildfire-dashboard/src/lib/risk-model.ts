@@ -86,7 +86,7 @@ export const COLOR_OPTIONS: { id: ColorBy; label: string; hint: string }[] = [
   {
     id: 'f_aspect',
     label: 'Aspect',
-    hint: 'How much of the zone faces the hot, dry south-west.',
+    hint: 'How much of the zone faces the hot, dry south-south-west.',
   },
   {
     id: 'f_history',
@@ -141,7 +141,7 @@ const FACTOR_META: Record<
         : 'land cover unknown',
   },
   aspect: {
-    label: 'Aspect (SW-facing)',
+    label: 'Aspect (SSW-facing)',
     value: (p) =>
       !isNum(p['aspect_deg'])
         ? '-'

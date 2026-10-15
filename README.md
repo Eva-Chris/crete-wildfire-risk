@@ -7,6 +7,24 @@ It also shows today's Fire Weather Index (FWI) at eight weather stations.
 > **This is a planning aid, not a warning system.** It does not predict where or when fires start.
 > For alerts use the Civil Protection services (112) and [EFFIS](https://effis.jrc.ec.europa.eu/).
 
+## Headline result
+
+Tested on fires the model never saw: built from fires up to 2021, scored against fires after 2021.
+
+| Measure                         | AUC                                          |
+| :------------------------------ | :------------------------------------------- |
+| This model                      | 0.63 (95% CI 0.52 to 0.73)                   |
+| Best single factor (aspect)     | 0.66                                         |
+| Previous version of the model   | 0.56                                         |
+| Fire Weather Index vs fire days | 0.64 (simple temp/wind/humidity index: 0.65) |
+
+**Finding:** the score ranks later-burned zones modestly better than chance, but no better than aspect
+alone. The FWI is no better than a simple index. Only 27 of 1,312 zones burned in the test period (38
+fire days for the FWI check), so the uncertainty is wide and small differences are not meaningful.
+The FWI is used because it is the EFFIS standard, not because it proved more accurate here.
+
+_Numbers from the October 2026 build. AUC is 0.5 for a coin flip and 1.0 for a perfect ranking._
+
 ![Screenshot](docs/screenshot.png)
 
 ## How it works

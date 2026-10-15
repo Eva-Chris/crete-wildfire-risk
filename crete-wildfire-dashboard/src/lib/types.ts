@@ -66,6 +66,7 @@ export interface Validation {
   auc_previous: number | null;
   /** Keys look like "f_fuel". */
   auc_factors: Record<string, number>;
+  auc_model_ci?: [number, number];
 }
 
 export interface ModelResponse {
@@ -74,4 +75,6 @@ export interface ModelResponse {
   breaks: number[];
   train_end: number;
   validation?: Validation | null;
+  n_zones?: number;
+  fwi_validation?: { n_fire_days: number; auc_fwi: number; auc_simple: number };
 }
