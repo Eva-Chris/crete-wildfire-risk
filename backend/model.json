@@ -1,0 +1,58 @@
+{
+ "weights": {
+  "fuel": 0.25,
+  "slope": 0.15,
+  "aspect": 0.1,
+  "history": 0.1,
+  "power": 0.12,
+  "roads": 0.12,
+  "wui": 0.16
+ },
+ "breaks": [
+  25.1,
+  33.6,
+  44.8,
+  52.8
+ ],
+ "train_end": 2021,
+ "n_zones": 1312,
+ "validation": {
+  "n_zones": 1312,
+  "n_positive": 27,
+  "min_burned_frac": 0.05,
+  "auc_model": 0.63,
+  "auc_model_ci": [
+   0.52,
+   0.73
+  ],
+  "auc_previous": 0.56,
+  "auc_factors": {
+   "f_fuel": 0.5,
+   "f_slope": 0.52,
+   "f_aspect": 0.66,
+   "f_history": 0.58,
+   "f_power": 0.53,
+   "f_roads": 0.56,
+   "f_wui": 0.56
+  }
+ },
+ "fuel_scores": {
+  "223": 64,
+  "242": 54,
+  "243": 47,
+  "311": 38,
+  "312": 50,
+  "321": 93,
+  "322": 40,
+  "323": 61,
+  "324": 25,
+  "332": 5,
+  "333": 34,
+  "334": 15
+ },
+ "fwi_validation": {
+  "n_fire_days": 38,
+  "auc_fwi": 0.64,
+  "auc_simple": 0.65
+ }
+}
