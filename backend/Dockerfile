@@ -3,13 +3,13 @@ FROM python:3.10-slim
 WORKDIR /app
 
 # Install dependencies
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend application code
-COPY . /app/
+# Copy the backend code as a package folder
+COPY backend/ /app/backend/
 
-# Ensure data directory exists and copy required data files into /app/data/
+# Copy data files into /app/data/
 RUN mkdir -p /app/data
 COPY *.geojson /app/data/
 COPY *.npz /app/data/
