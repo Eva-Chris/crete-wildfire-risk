@@ -24,7 +24,7 @@ jobs:
           cache: npm
           cache-dependency-path: crete-wildfire-dashboard/package-lock.json
       - run: npm ci
-      - run: npx ng build --base-href /crete-wildfire-risk/
+      - run: npx ng build --configuration production --base-href /crete-wildfire-risk/
       - run: cp dist/crete-wildfire-dashboard/browser/index.html dist/crete-wildfire-dashboard/browser/404.html
       - uses: actions/upload-pages-artifact@v3
         with:
